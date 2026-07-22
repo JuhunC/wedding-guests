@@ -101,7 +101,7 @@
   .save-pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
 
   /* ---------- Summary (sticky) ---------- */
-  .summary{ position:sticky; top:0; z-index:30; background:var(--bg); padding:14px 0 10px; margin-top:16px; }
+  .summary{ background:var(--bg); padding:6px 0 10px; margin-top:14px; }   /* 스크롤 시 상단 고정 안 함 */
   .summary-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:9px; }
   .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:9px; }
   .stat{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 14px; box-shadow:var(--shadow); }
@@ -212,11 +212,11 @@
   .toolbar{ background:var(--panel); border-top:1px solid var(--line); padding:9px 16px; }
   .ad-bar{ border-top:1px solid var(--line); background:var(--bg); display:flex; flex-direction:column; align-items:center; padding:4px 12px 7px; }
   .ad-label{ font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); opacity:.7; padding:2px 0 3px; }
-  .ad-slot{ width:100%; max-width:760px; height:56px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-  .ad-demo{ width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  .ad-slot{ width:100%; max-width:760px; min-height:56px; display:flex; align-items:center; justify-content:center; }
+  .ad-demo{ width:100%; min-height:52px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:8px;
     border:1px dashed var(--line); border-radius:8px; color:var(--muted); font-size:13px; font-weight:600; }
   .ad-demo span{ font-size:10.5px; font-weight:400; opacity:.85; letter-spacing:.02em; }
-  @media (min-width:960px){ .ad-slot{ height:90px; } }
+  @media (min-width:960px){ .ad-slot{ min-height:90px; } }
 
   .consent{ position:fixed; left:0; right:0; bottom:0; z-index:80; background:var(--panel);
     border-top:1px solid var(--line); box-shadow:0 -8px 30px rgba(0,0,0,.14);
@@ -578,13 +578,18 @@
 (function(){
   "use strict";
   var AD_CONFIG = {
-    client: '',      /* ← Google AdSense 게시자 ID (예: 'ca-pub-1234567890123456') */
-    slot:   '',      /* ← 광고 단위 슬롯 ID (예: '1234567890') */
-    demo:   true     /* true = 실제 광고 대신 '광고 자리' 미리보기 표시. 실제 게시 전 확인용.
-                        · client/slot 을 채우면 실제 광고가 뜹니다.
-                        · 광고를 완전히 숨기려면 demo:false 로 두고 client 를 비워두세요. */
+    client: '',            /* ← Google AdSense 게시자 ID (예: 'ca-pub-1234567890123456') */
+    slot:   '',            /* ← 광고 단위 슬롯 ID (예: '1234567890') */
+    demo:   true,          /* true = 실제 광고 대신 '광고 자리' 미리보기 표시. 실제 게시 전 확인용.
+                              · client/slot 을 채우면 실제 광고가 뜹니다.
+                              · 광고를 완전히 숨기려면 demo:false 로 두고 client 를 비워두세요. */
+    personalizedAds: true  /* false 로 두면 비개인화 광고 요청(쿠키 기반 맞춤 최소화, 수익은 낮아질 수 있음). */
   };
-  var CONSENT_ENABLED = true;   /* EU/EEA 대상 서비스는 Google 인증 CMP 사용 권장(AdSense → 개인정보 보호 및 메시지). */
+  /* 개인정보 동의: 아래 배너는 '간단 고지'이며 Google 인증 CMP가 아닙니다.
+     ▸ 유럽경제지역(EEA)·영국 대상 트래픽에는 Google 인증 CMP가 '필수'입니다(권장 아님).
+       AdSense → 개인정보 보호 및 메시지 → GDPR 메시지를 켜면 adsbygoogle.js가 자동으로 동의 UI를 띄웁니다.
+       그 경우 아래 CONSENT_ENABLED 를 false 로 두어 배너 중복을 피하세요. */
+  var CONSENT_ENABLED = true;
   var CONSENT_KEY = 'wg.consent.v1';
 
   var $ = function(id){ return document.getElementById(id); };
@@ -612,7 +617,7 @@
     ins.setAttribute('data-ad-format', 'horizontal');
     ins.setAttribute('data-full-width-responsive', 'true');
     adSlot.appendChild(ins);
-    try{ (window.adsbygoogle = window.adsbygoogle || []).push({}); }catch(e){}
+    try{ (window.adsbygoogle = window.adsbygoogle || []).push(AD_CONFIG.personalizedAds ? {} : { requestNonPersonalizedAds: 1 }); }catch(e){}
     revealAdBar();
     return true;
   }
