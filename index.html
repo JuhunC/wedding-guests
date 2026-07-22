@@ -1459,13 +1459,28 @@
       if(e.key===STORE_KEY){ const p = parsePayload(e.newValue); if(p){ entries = p.entries; nextSeq = Math.max(nextSeq, p.nextSeq||1); reconcileSeq(); renderAll(); } }
     });
 
-    // 터치 기기: 입력 중엔 하단 툴바를 내려 키보드 겹침 방지
+    // 터치 기기: 키보드가 올라오면 하단 도크를 잠깐 내려 겹침 방지 → 키보드가 내려가면 반드시 복귀
     if(window.matchMedia && window.matchMedia('(pointer: coarse)').matches){
-      let kbT = null;
-      document.addEventListener('focusin', e=>{
-        if(e.target.matches && e.target.matches('input:not([type=file]), textarea')){ clearTimeout(kbT); document.body.classList.add('kb'); }
-      });
-      document.addEventListener('focusout', ()=>{ kbT = setTimeout(()=>document.body.classList.remove('kb'), 200); });
+      const setKb = on => document.body.classList.toggle('kb', !!on);
+      const isTyping = () => { const a = document.activeElement; return !!(a && a.matches && a.matches('input:not([type=file]), textarea')); };
+      const vv = window.visualViewport;
+      if(vv){
+        // 시각 뷰포트가 키보드 높이만큼 줄면 도크 내림. 키보드가 닫혀 차이가 작아지면 자동 복귀.
+        const onVV = () => setKb((window.innerHeight - vv.height) > 150 && isTyping());
+        vv.addEventListener('resize', onVV);
+        vv.addEventListener('scroll', onVV);
+      } else {
+        // 구형 브라우저 폴백: 포커스 기준 (blur가 안 와도 activeElement로 재확인)
+        let kbT = null;
+        document.addEventListener('focusin', e=>{
+          if(e.target.matches && e.target.matches('input:not([type=file]), textarea')){ clearTimeout(kbT); setKb(true); }
+        });
+        document.addEventListener('focusout', ()=>{ clearTimeout(kbT); kbT = setTimeout(()=>{ if(!isTyping()) setKb(false); }, 250); });
+      }
+      // 안전망: 입력에서 포커스가 빠지거나 페이지가 복귀하면 무조건 도크 복원 (막힘 방지)
+      document.addEventListener('focusout', ()=>{ setTimeout(()=>{ if(!isTyping()) setKb(false); }, 300); });
+      window.addEventListener('pageshow', ()=>setKb(false));
+      document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && !isTyping()) setKb(false); });
     }
 
     // Esc로 열린 시트 닫기
