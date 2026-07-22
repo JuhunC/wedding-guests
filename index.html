@@ -261,6 +261,9 @@
     padding:15px; border:1px solid var(--line); border-radius:12px; background:var(--bg); color:var(--ink); font-size:15px; font-weight:600; }
   .menu-list button .mic{ font-size:19px; width:24px; text-align:center; }
   .menu-list button small{ display:block; font-weight:400; color:var(--muted); font-size:12px; margin-top:2px; }
+  .menu-list button.danger-item{ color:var(--danger); border-color:var(--danger-soft); }
+  .menu-list button.danger-item small{ color:var(--muted); }
+  .menu-list button.danger-item:active{ background:var(--danger-soft); }
 
   .snap-list{ display:flex; flex-direction:column; gap:8px; margin:2px 0 14px; max-height:52vh; overflow:auto; }
   .snap-list button{ display:flex; justify-content:space-between; align-items:center; gap:9px; width:100%;
@@ -521,6 +524,7 @@
       <button id="btnPasteRestore"><span class="mic">✎</span><span>백업 텍스트 붙여넣기 복원<small>백업 내용을 직접 붙여넣어 복원</small></span></button>
       <button id="btnPrint"><span class="mic">🖨️</span><span>인쇄 / PDF 저장<small>명부를 종이나 PDF로</small></span></button>
       <button id="btnInstall" hidden><span class="mic">📲</span><span>홈 화면에 앱 설치<small>오프라인에서도 바로 열려요</small></span></button>
+      <button id="btnClearAll" class="danger-item"><span class="mic">🗑️</span><span>전체 삭제 후 새로 시작<small>모든 기록을 지우고 처음부터 (되돌리기·자동 백업 가능)</small></span></button>
     </div>
     <p class="sheet-foot"><a href="privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a> · 데이터는 이 기기에만 저장됩니다</p>
     <div class="modal-actions"><button class="btn-cancel" id="moreClose">닫기</button></div>
@@ -1368,6 +1372,28 @@
   function openMore(){ $('moreBackdrop').classList.add('show'); }
   function closeMore(){ $('moreBackdrop').classList.remove('show'); }
 
+  // 전체 삭제 후 새로 시작 (삭제 전 자동 백업 + 되돌리기 2중 안전장치)
+  function clearAll(){
+    closeMore();
+    if(entries.length === 0){ toast('삭제할 내역이 없어요'); return; }
+    const n = entries.length;
+    const ok = confirm(n + '건을 모두 삭제하고 처음부터 다시 시작합니다.\n\n삭제 후에도 잠시 동안은 [되돌리기] 또는 [더보기 → 자동 백업에서 복구]로 되살릴 수 있어요.\n\n계속할까요?');
+    if(!ok) return;
+    const prev = entries.slice();
+    const prevNext = nextSeq;
+    pushSnapshot(makePayload());              // 삭제 전 상태를 자동 백업에 남김
+    entries = [];
+    nextSeq = 1;
+    lastSnapSig = null;
+    filter.q = ''; $('search').value = ''; setListSide('all');
+    persist(); renderAll(); resetInputDefaults();
+    showUndo('전체 삭제됨 · ' + n + '건', '되돌리기', ()=>{
+      entries = prev; nextSeq = prevNext; reconcileSeq();
+      lastSnapSig = null; persist(); renderAll();
+      toast(prev.length + '건을 되돌렸어요');
+    }, 10000);
+  }
+
   // ============================================================
   //  토스트 / 되돌리기 (별도 호스트 → 서로를 지우지 않음)
   // ============================================================
@@ -1441,6 +1467,7 @@
     $('moreClose').addEventListener('click', closeMore);
     $('moreBackdrop').addEventListener('click', e=>{ if(e.target===$('moreBackdrop')) closeMore(); });
     $('btnPrint').addEventListener('click', ()=>{ closeMore(); setTimeout(()=>window.print(), 150); });
+    $('btnClearAll').addEventListener('click', clearAll);
     $('btnSnapRestore').addEventListener('click', openSnapRestore);
     $('snapClose').addEventListener('click', ()=>$('snapBackdrop').classList.remove('show'));
     $('snapBackdrop').addEventListener('click', e=>{ if(e.target===$('snapBackdrop')) $('snapBackdrop').classList.remove('show'); });
