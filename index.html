@@ -209,6 +209,7 @@
   .bottom-dock{ position:fixed; left:0; right:0; bottom:0; z-index:45; background:var(--panel);
     box-shadow:0 -4px 18px rgba(70,55,25,.07); transition:transform .18s ease; padding-bottom:env(safe-area-inset-bottom); }
   body.kb .bottom-dock{ transform:translateY(130%); }
+  .bottom-dock.dock-hidden{ transform:translateY(130%); }   /* 아래로 스크롤 시 숨김 */
   .toolbar{ background:var(--panel); border-top:1px solid var(--line); padding:9px 16px; }
   .ad-bar{ border-top:1px solid var(--line); background:var(--bg); display:flex; flex-direction:column; align-items:center; padding:4px 12px 7px; }
   .ad-label{ font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); opacity:.7; padding:2px 0 3px; }
@@ -1482,6 +1483,24 @@
       window.addEventListener('pageshow', ()=>setKb(false));
       document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && !isTyping()) setKb(false); });
     }
+
+    // 하단 도크: 아래로 스크롤하면 숨기고, 위로 스크롤하거나 맨 위면 다시 표시 (공간 확보)
+    // 데스크톱(≥960px)은 body가 스크롤되지 않아 window scroll 이벤트가 없으므로 항상 표시됨.
+    (function(){
+      const dockEl = $('bottomDock'); if(!dockEl) return;
+      let lastY = 0, ticking = false;
+      function apply(y){
+        if(document.body.classList.contains('kb')) return;         // 키보드로 숨김 중이면 개입 안 함
+        if(y < 40) dockEl.classList.remove('dock-hidden');          // 맨 위 → 표시
+        else if(y > lastY + 8) dockEl.classList.add('dock-hidden'); // 아래로 → 숨김
+        else if(y < lastY - 8) dockEl.classList.remove('dock-hidden'); // 위로 → 표시
+        lastY = y;
+      }
+      window.addEventListener('scroll', ()=>{
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        if(!ticking){ ticking = true; requestAnimationFrame(()=>{ apply(y); ticking = false; }); }
+      }, { passive:true });
+    })();
 
     // Esc로 열린 시트 닫기
     window.addEventListener('keydown', e=>{
