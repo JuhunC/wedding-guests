@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#F5F0E8">
 <title>축의 장부</title>
+<meta name="description" content="축의금을 기록하고 정리하는 무료 웹앱 — 로그인 없이 바로 사용하고, 데이터는 내 기기에만 저장됩니다.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="축의 장부">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='44' fill='none' stroke='%23BE9A44' stroke-width='3'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23BE9A44' font-family='Georgia,serif'>囍</text></svg>">
 <style>
   :root{
@@ -49,7 +56,8 @@
   button{font-family:inherit; cursor:pointer; color:inherit}
   input,select,textarea{font-family:inherit}
 
-  .wrap{max-width:760px; margin:0 auto; padding:0 16px 132px}
+  :root{ --dock-h:120px; }   /* 하단 도크(툴바+광고) 높이 — JS가 실측 갱신 */
+  .wrap{max-width:760px; margin:0 auto; padding:0 16px calc(var(--dock-h) + 18px)}
 
   /* ---------- Ornaments ---------- */
   .eyebrow{
@@ -198,10 +206,31 @@
   .empty .big{ font-size:30px; margin-bottom:10px; color:var(--brand); }
 
   /* ---------- Toolbar ---------- */
-  .toolbar{ position:fixed; left:0; right:0; bottom:0; z-index:45; background:var(--panel);
-    border-top:1px solid var(--line); padding:9px 16px calc(9px + env(safe-area-inset-bottom));
-    box-shadow:0 -4px 18px rgba(70,55,25,.06); transition:transform .18s ease; }
-  body.kb .toolbar{ transform:translateY(130%); }
+  .bottom-dock{ position:fixed; left:0; right:0; bottom:0; z-index:45; background:var(--panel);
+    box-shadow:0 -4px 18px rgba(70,55,25,.07); transition:transform .18s ease; padding-bottom:env(safe-area-inset-bottom); }
+  body.kb .bottom-dock{ transform:translateY(130%); }
+  .toolbar{ background:var(--panel); border-top:1px solid var(--line); padding:9px 16px; }
+  .ad-bar{ border-top:1px solid var(--line); background:var(--bg); display:flex; flex-direction:column; align-items:center; padding:4px 12px 7px; }
+  .ad-label{ font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); opacity:.7; padding:2px 0 3px; }
+  .ad-slot{ width:100%; max-width:760px; height:56px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .ad-demo{ width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    border:1px dashed var(--line); border-radius:8px; color:var(--muted); font-size:13px; font-weight:600; }
+  .ad-demo span{ font-size:10.5px; font-weight:400; opacity:.85; letter-spacing:.02em; }
+  @media (min-width:960px){ .ad-slot{ height:90px; } }
+
+  .consent{ position:fixed; left:0; right:0; bottom:0; z-index:80; background:var(--panel);
+    border-top:1px solid var(--line); box-shadow:0 -8px 30px rgba(0,0,0,.14);
+    padding:14px 16px calc(14px + env(safe-area-inset-bottom)); }
+  .consent-inner{ max-width:760px; margin:0 auto; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .consent p{ margin:0; font-size:12.5px; color:var(--ink); line-height:1.55; flex:1 1 320px; }
+  .consent a{ color:var(--brand-strong); font-weight:600; }
+  .consent-actions{ display:flex; gap:8px; margin-left:auto; }
+  .consent-actions button{ padding:11px 20px; border-radius:9px; font-size:14px; font-weight:600; border:1px solid var(--line); }
+  .c-accept{ background:var(--brand-strong); color:var(--on-accent); border-color:var(--brand-strong)!important; }
+  .c-ghost{ background:var(--bg); color:var(--muted); }
+  .sheet-foot{ text-align:center; font-size:12px; color:var(--muted); margin:14px 0 2px; }
+  .sheet-foot a{ color:var(--brand-strong); font-weight:600; }
+  [hidden]{ display:none!important; }
   .toolbar .wrapb{ max-width:760px; margin:0 auto; display:flex; gap:8px; }
   .toolbar button{ flex:1; padding:9px 6px; border-radius:11px; border:1px solid transparent; background:transparent;
     color:var(--muted); font-size:11.5px; font-weight:600; display:flex; flex-direction:column; align-items:center; gap:4px; letter-spacing:.02em; }
@@ -244,7 +273,7 @@
 
   /* ---------- Toast / Undo ---------- */
   .toast-host{ position:fixed; left:0; right:0; z-index:70; display:flex; flex-direction:column; align-items:center; gap:8px; pointer-events:none; padding:0 16px; }
-  #toastHost{ bottom:92px; } #undoHost{ bottom:150px; }
+  #toastHost{ bottom:calc(var(--dock-h) + 14px); } #undoHost{ bottom:calc(var(--dock-h) + 68px); }
   body.kb #toastHost{ bottom:20px; } body.kb #undoHost{ bottom:78px; }
   .toast{ background:#2E2A22; color:#F5F0E8; padding:12px 16px; border-radius:11px; font-size:14px; font-weight:500;
     box-shadow:0 10px 28px rgba(0,0,0,.32); display:flex; align-items:center; gap:14px; pointer-events:auto; max-width:760px; width:100%; animation:toastin .2s ease; }
@@ -258,7 +287,7 @@
   @media (min-width: 960px){
     body{ overflow:hidden; }
     .wrap{ max-width:1280px; height:100vh; display:grid; grid-template-columns:minmax(360px,440px) 1fr; gap:30px; padding:0 24px; }
-    .col-left, .col-right{ height:100vh; overflow-y:auto; overscroll-behavior:contain; padding-bottom:88px; }
+    .col-left, .col-right{ height:100vh; overflow-y:auto; overscroll-behavior:contain; padding-bottom:calc(var(--dock-h) + 20px); }
     .col-left{ padding-top:2px; padding-right:4px; }
     .col-right{ padding-top:2px; }
     header.hero{ margin-top:12px; }
@@ -424,17 +453,23 @@
   </div><!-- /col-right -->
 </div>
 
-<!-- 하단 툴바 -->
-<div class="toolbar">
-  <div class="wrapb">
-    <button id="btnExcel" class="primary">
-      <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>엑셀 저장</button>
-    <button id="btnBackup">
-      <svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><path d="M8 4v5h7"/><circle cx="12" cy="15" r="2.4"/></svg>백업</button>
-    <button id="btnRestore">
-      <svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M12 17v-5m0 0-2 2m2-2 2 2"/></svg>복원</button>
-    <button id="btnMore">
-      <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>더보기</button>
+<!-- 하단 도크: 툴바 + 광고 -->
+<div class="bottom-dock" id="bottomDock">
+  <div class="toolbar">
+    <div class="wrapb">
+      <button id="btnExcel" class="primary">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>엑셀 저장</button>
+      <button id="btnBackup">
+        <svg viewBox="0 0 24 24"><path d="M5 4h11l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><path d="M8 4v5h7"/><circle cx="12" cy="15" r="2.4"/></svg>백업</button>
+      <button id="btnRestore">
+        <svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M12 17v-5m0 0-2 2m2-2 2 2"/></svg>복원</button>
+      <button id="btnMore">
+        <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>더보기</button>
+    </div>
+  </div>
+  <div class="ad-bar" id="adBar" hidden>
+    <div class="ad-label">광고 · Advertisement</div>
+    <div class="ad-slot" id="adSlot"></div>
   </div>
 </div>
 
@@ -484,7 +519,9 @@
       <button id="btnSnapRestore"><span class="mic">🕊️</span><span>자동 백업에서 복구<small>실수로 지웠거나 목록이 사라졌을 때</small></span></button>
       <button id="btnPasteRestore"><span class="mic">✎</span><span>백업 텍스트 붙여넣기 복원<small>백업 내용을 직접 붙여넣어 복원</small></span></button>
       <button id="btnPrint"><span class="mic">🖨️</span><span>인쇄 / PDF 저장<small>명부를 종이나 PDF로</small></span></button>
+      <button id="btnInstall" hidden><span class="mic">📲</span><span>홈 화면에 앱 설치<small>오프라인에서도 바로 열려요</small></span></button>
     </div>
+    <p class="sheet-foot"><a href="privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a> · 데이터는 이 기기에만 저장됩니다</p>
     <div class="modal-actions"><button class="btn-cancel" id="moreClose">닫기</button></div>
   </div>
 </div>
@@ -521,6 +558,129 @@
 
 <div class="toast-host" id="undoHost"></div>
 <div class="toast-host" id="toastHost"></div>
+
+<!-- 쿠키/광고 동의 배너 -->
+<div class="consent" id="consentBanner" hidden>
+  <div class="consent-inner">
+    <p>원활한 서비스와 광고 표시를 위해 쿠키가 사용될 수 있어요. 입력하신 축의 데이터는 <b>이 기기에만</b> 저장되며 서버로 전송되지 않습니다. <a href="privacy.html" target="_blank" rel="noopener">개인정보 처리방침</a></p>
+    <div class="consent-actions">
+      <button id="consentDecline" class="c-ghost">거부</button>
+      <button id="consentAccept" class="c-accept">동의</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     광고(AdSense) · 개인정보 동의 · PWA(설치·오프라인) — 호스팅 시 동작
+     ▸ 광고를 켜려면 아래 AD_CONFIG의 client / slot 에 본인 값을 넣으세요.
+     ============================================================ -->
+<script>
+(function(){
+  "use strict";
+  var AD_CONFIG = {
+    client: '',      /* ← Google AdSense 게시자 ID (예: 'ca-pub-1234567890123456') */
+    slot:   '',      /* ← 광고 단위 슬롯 ID (예: '1234567890') */
+    demo:   true     /* true = 실제 광고 대신 '광고 자리' 미리보기 표시. 실제 게시 전 확인용.
+                        · client/slot 을 채우면 실제 광고가 뜹니다.
+                        · 광고를 완전히 숨기려면 demo:false 로 두고 client 를 비워두세요. */
+  };
+  var CONSENT_ENABLED = true;   /* EU/EEA 대상 서비스는 Google 인증 CMP 사용 권장(AdSense → 개인정보 보호 및 메시지). */
+  var CONSENT_KEY = 'wg.consent.v1';
+
+  var $ = function(id){ return document.getElementById(id); };
+  var dock = $('bottomDock'), adBar = $('adBar'), adSlot = $('adSlot');
+
+  function measureDock(){
+    if(!dock) return;
+    var h = Math.round(dock.getBoundingClientRect().height);
+    if(h > 0) document.documentElement.style.setProperty('--dock-h', h + 'px');
+  }
+  function revealAdBar(){ if(adBar){ adBar.hidden = false; measureDock(); } }
+
+  function loadRealAds(){
+    if(!AD_CONFIG.client || !AD_CONFIG.slot) return false;
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(AD_CONFIG.client);
+    s.crossOrigin = 'anonymous';
+    document.head.appendChild(s);
+    var ins = document.createElement('ins');
+    ins.className = 'adsbygoogle';
+    ins.style.display = 'block'; ins.style.width = '100%'; ins.style.height = '100%';
+    ins.setAttribute('data-ad-client', AD_CONFIG.client);
+    ins.setAttribute('data-ad-slot', AD_CONFIG.slot);
+    ins.setAttribute('data-ad-format', 'horizontal');
+    ins.setAttribute('data-full-width-responsive', 'true');
+    adSlot.appendChild(ins);
+    try{ (window.adsbygoogle = window.adsbygoogle || []).push({}); }catch(e){}
+    revealAdBar();
+    return true;
+  }
+  function showDemo(){
+    adSlot.innerHTML = '<div class="ad-demo">여기에 광고가 표시됩니다<span>AD_CONFIG에 AdSense ID 입력 후 노출</span></div>';
+    revealAdBar();
+  }
+  function initAds(){
+    if(AD_CONFIG.client && AD_CONFIG.slot) loadRealAds();
+    else if(AD_CONFIG.demo) showDemo();
+    /* 둘 다 아니면 광고바를 숨긴 채로 둠(기본) */
+  }
+
+  function consentValue(){ try{ return localStorage.getItem(CONSENT_KEY); }catch(e){ return null; } }
+  function setupConsent(){
+    var wantsAds = (AD_CONFIG.client && AD_CONFIG.slot) || AD_CONFIG.demo;
+    if(!wantsAds) return;                      /* 광고 자체가 없으면 배너 불필요 */
+    if(!CONSENT_ENABLED){ initAds(); return; }
+    var v = consentValue();
+    if(v === 'accept'){ initAds(); return; }
+    if(v === 'decline'){ if(AD_CONFIG.demo && !AD_CONFIG.client) initAds(); return; }  /* 데모는 외부요청 없음 */
+    var banner = $('consentBanner');
+    if(!banner){ initAds(); return; }
+    banner.hidden = false;
+    $('consentAccept').addEventListener('click', function(){
+      try{ localStorage.setItem(CONSENT_KEY,'accept'); }catch(e){}
+      banner.hidden = true; initAds();
+    });
+    $('consentDecline').addEventListener('click', function(){
+      try{ localStorage.setItem(CONSENT_KEY,'decline'); }catch(e){}
+      banner.hidden = true;
+      if(AD_CONFIG.demo && !AD_CONFIG.client) initAds();
+    });
+  }
+
+  /* 도크 높이 실측 → --dock-h */
+  if(window.ResizeObserver){ try{ new ResizeObserver(measureDock).observe(dock); }catch(e){} }
+  window.addEventListener('resize', measureDock);
+  window.addEventListener('load', measureDock);
+  measureDock();
+
+  /* PWA: 서비스워커 (http/https에서만, file://·미리보기에선 건너뜀) */
+  if('serviceWorker' in navigator && location.protocol.indexOf('http') === 0){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+    });
+  }
+
+  /* PWA: 설치 프롬프트 */
+  var deferredPrompt = null, installBtn = $('btnInstall');
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault(); deferredPrompt = e;
+    if(installBtn) installBtn.hidden = false;
+  });
+  if(installBtn){
+    installBtn.addEventListener('click', function(){
+      if(!deferredPrompt) return;
+      deferredPrompt.prompt();
+      var done = function(){ deferredPrompt = null; installBtn.hidden = true; };
+      if(deferredPrompt.userChoice && deferredPrompt.userChoice.then) deferredPrompt.userChoice.then(done, done);
+      else done();
+    });
+  }
+  window.addEventListener('appinstalled', function(){ if(installBtn) installBtn.hidden = true; });
+
+  setupConsent();
+})();
+</script>
 
 <script>
 "use strict";
