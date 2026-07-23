@@ -528,7 +528,7 @@
     <div class="menu-list">
       <button id="btnSnapRestore"><span class="mic">🕊️</span><span>자동 백업에서 복구<small>실수로 지웠거나 목록이 사라졌을 때</small></span></button>
       <button id="btnPasteRestore"><span class="mic">✎</span><span>백업 텍스트 붙여넣기 복원<small>백업 내용을 직접 붙여넣어 복원</small></span></button>
-      <button id="btnCombine"><span class="mic">🔗</span><span>다른 기기 데이터 합치기<small>신랑측·신부측 백업 파일을 현재 목록에 추가</small></span></button>
+      <button id="btnCombine"><span class="mic">🔗</span><span>다른 기기 데이터 합치기<small>다른 기기의 <b>‘엑셀 저장’ 파일</b>을 현재 목록에 합쳐요</small></span></button>
       <button id="btnPrint"><span class="mic">🖨️</span><span>인쇄 / PDF 저장<small>명부를 종이나 PDF로</small></span></button>
       <button id="btnInstall" hidden><span class="mic">📲</span><span>홈 화면에 앱 설치<small>오프라인에서도 바로 열려요</small></span></button>
       <button id="btnClearAll" class="danger-item"><span class="mic">🗑️</span><span>전체 삭제 후 새로 시작<small>모든 기록을 지우고 처음부터 (되돌리기·자동 백업 가능)</small></span></button>
@@ -567,8 +567,8 @@
 
 <!-- 복원 파일 입력 -->
 <input type="file" id="fileInput" accept=".json,application/json,text/plain" class="hidden">
-<!-- 합치기 파일 입력 -->
-<input type="file" id="combineInput" accept=".json,application/json,text/plain" class="hidden">
+<!-- 합치기 파일 입력 (엑셀 저장 CSV 우선, JSON 백업도 허용) -->
+<input type="file" id="combineInput" accept=".csv,.json,text/csv,application/json,text/plain" class="hidden">
 
 <div class="toast-host" id="undoHost"></div>
 <div class="toast-host" id="toastHost"></div>
@@ -1342,27 +1342,88 @@
     reader.readAsText(file);
   }
 
-  // 다른 기기 데이터 합치기 (교체가 아니라 추가 병합) — id로 중복 제외, 순번은 새로 부여
+  // CSV 파서 (따옴표·이스케이프 처리) → 행 배열
+  function parseCsvText(text){
+    text = String(text||'').replace(/^﻿/,'');
+    const rows = []; let row = [], field = '', inQ = false;
+    for(let i=0; i<text.length; i++){
+      const c = text[i];
+      if(inQ){
+        if(c === '"'){ if(text[i+1] === '"'){ field += '"'; i++; } else inQ = false; }
+        else field += c;
+      } else {
+        if(c === '"') inQ = true;
+        else if(c === ','){ row.push(field); field = ''; }
+        else if(c === '\n'){ row.push(field); rows.push(row); row = []; field = ''; }
+        else if(c === '\r'){ /* \n에서 처리 */ }
+        else field += c;
+      }
+    }
+    if(field.length || row.length){ row.push(field); rows.push(row); }
+    return rows;
+  }
+  function parseCsvTs(s){
+    const m = String(s||'').match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
+    if(m){ try{ return new Date(+m[1], +m[2]-1, +m[3], +m[4], +m[5]).getTime(); }catch(e){} }
+    return Date.now();
+  }
+  // '엑셀 저장'(CSV) → 항목 배열 (엑셀 저장 형식이 아니면 null)
+  function csvToEntries(text){
+    const rows = parseCsvText(text);
+    if(!rows.length) return null;
+    const header = rows[0].map(h=>String(h).trim());
+    const col = n => header.indexOf(n);
+    const iNo=col('번호'), iName=col('이름'), iAmt=col('금액'), iTk=col('식권'),
+          iSide=col('측'), iRel=col('관계/소속'), iMemo=col('메모'), iTs=col('입력시각');
+    if(iName < 0 || iAmt < 0) return null;   // 엑셀 저장 형식 아님
+    const out = [];
+    for(let r=1; r<rows.length; r++){
+      const row = rows[r]; const cell = i => (i>=0 && row[i]!=null) ? String(row[i]).trim() : '';
+      if(!/^\d+$/.test(cell(iNo))) continue;   // 번호 없는 행(합계/빈줄) 제외
+      const side = cell(iSide);
+      out.push({
+        name: cell(iName),
+        amount: cell(iAmt).replace(/[^0-9]/g,''),
+        tickets: cell(iTk).replace(/[^0-9]/g,'') || 0,
+        side: side==='신랑측' ? 'groom' : (side==='신부측' ? 'bride' : ''),
+        relation: cell(iRel),
+        memo: cell(iMemo),
+        createdAt: parseCsvTs(cell(iTs)),
+      });
+    }
+    return out;
+  }
+
+  // 다른 기기 데이터 합치기 (교체가 아니라 추가 병합). '엑셀 저장'(CSV) 우선, JSON 백업도 허용.
   function combineData(text){
-    const p = parsePayload(text);
-    if(!p || p.entries.length===0){ toast('합칠 데이터를 읽지 못했어요'); return false; }
-    const existingIds = new Set(entries.map(e=>e.id));
-    const incoming = p.entries.filter(e=> !existingIds.has(e.id));
-    const dup = p.entries.length - incoming.length;
-    if(incoming.length===0){ toast('새로 합칠 내역이 없어요' + (dup?(' (이미 ' + dup + '건 포함됨)'):'')); return false; }
-    const ok = confirm('다른 기기의 ' + incoming.length + '건을 현재 목록(' + entries.length + '건)에 추가합니다.'
-      + (dup ? ('\n이미 있는 ' + dup + '건은 제외돼요.') : '')
-      + '\n\n계속할까요?');
+    const head = String(text||'').replace(/^﻿/,'').replace(/^\s+/,'').charAt(0);
+    let incoming = null, mode = '';
+    if(head === '{' || head === '['){ const p = parsePayload(text); if(p){ incoming = p.entries; mode = 'json'; } }
+    if(!incoming){ const raw = csvToEntries(text); if(raw){ incoming = raw.map(normalizeEntry).filter(Boolean); mode = 'csv'; } }
+    if(!incoming || incoming.length===0){ toast("합칠 데이터를 읽지 못했어요. '엑셀 저장' 파일을 선택하세요."); return false; }
+
+    let toAdd;
+    if(mode === 'json'){
+      const ids = new Set(entries.map(e=>e.id));
+      toAdd = incoming.filter(e=> !ids.has(e.id));
+    } else {
+      const sig = e => [e.name,e.amount,e.tickets,e.side,e.relation,e.memo,Math.floor((e.createdAt||0)/60000)].join('|');
+      const existing = new Set(entries.map(sig)); const seen = new Set();
+      toAdd = incoming.filter(e=>{ const k=sig(e); if(existing.has(k)||seen.has(k)) return false; seen.add(k); return true; });
+    }
+    const dup = incoming.length - toAdd.length;
+    if(toAdd.length===0){ toast('새로 합칠 내역이 없어요' + (dup?(' (이미 ' + dup + '건 포함됨)'):'')); return false; }
+    const ok = confirm('다른 기기의 ' + toAdd.length + '건을 현재 목록(' + entries.length + '건)에 추가합니다.'
+      + (dup ? ('\n이미 있는 ' + dup + '건은 제외돼요.') : '') + '\n\n계속할까요?');
     if(!ok) return false;
-    const prev = entries.slice();
-    const prevNext = nextSeq;
+    const prev = entries.slice(); const prevNext = nextSeq;
     pushSnapshot(makePayload());                 // 합치기 전 상태를 자동 백업에 남김
-    incoming.forEach(e=>{ e.seq = undefined; });  // 들어오는 항목은 현재 뒤에 새 순번 부여
-    entries = entries.concat(incoming);
+    toAdd.forEach(e=>{ e.seq = undefined; });      // 들어오는 항목은 현재 뒤에 새 순번 부여
+    entries = entries.concat(toAdd);
     reconcileSeq();
     lastSnapSig = null;
     persist(); renderAll();
-    showUndo(incoming.length + '건 합쳤어요 · 총 ' + entries.length + '건', '되돌리기', ()=>{
+    showUndo(toAdd.length + '건 합쳤어요 · 총 ' + entries.length + '건', '되돌리기', ()=>{
       entries = prev; nextSeq = prevNext; reconcileSeq();
       lastSnapSig = null; persist(); renderAll();
       toast('되돌렸어요');
