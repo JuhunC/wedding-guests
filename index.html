@@ -528,6 +528,7 @@
     <div class="menu-list">
       <button id="btnSnapRestore"><span class="mic">🕊️</span><span>자동 백업에서 복구<small>실수로 지웠거나 목록이 사라졌을 때</small></span></button>
       <button id="btnPasteRestore"><span class="mic">✎</span><span>백업 텍스트 붙여넣기 복원<small>백업 내용을 직접 붙여넣어 복원</small></span></button>
+      <button id="btnCombine"><span class="mic">🔗</span><span>다른 기기 데이터 합치기<small>신랑측·신부측 백업 파일을 현재 목록에 추가</small></span></button>
       <button id="btnPrint"><span class="mic">🖨️</span><span>인쇄 / PDF 저장<small>명부를 종이나 PDF로</small></span></button>
       <button id="btnInstall" hidden><span class="mic">📲</span><span>홈 화면에 앱 설치<small>오프라인에서도 바로 열려요</small></span></button>
       <button id="btnClearAll" class="danger-item"><span class="mic">🗑️</span><span>전체 삭제 후 새로 시작<small>모든 기록을 지우고 처음부터 (되돌리기·자동 백업 가능)</small></span></button>
@@ -566,6 +567,8 @@
 
 <!-- 복원 파일 입력 -->
 <input type="file" id="fileInput" accept=".json,application/json,text/plain" class="hidden">
+<!-- 합치기 파일 입력 -->
+<input type="file" id="combineInput" accept=".json,application/json,text/plain" class="hidden">
 
 <div class="toast-host" id="undoHost"></div>
 <div class="toast-host" id="toastHost"></div>
@@ -1339,6 +1342,41 @@
     reader.readAsText(file);
   }
 
+  // 다른 기기 데이터 합치기 (교체가 아니라 추가 병합) — id로 중복 제외, 순번은 새로 부여
+  function combineData(text){
+    const p = parsePayload(text);
+    if(!p || p.entries.length===0){ toast('합칠 데이터를 읽지 못했어요'); return false; }
+    const existingIds = new Set(entries.map(e=>e.id));
+    const incoming = p.entries.filter(e=> !existingIds.has(e.id));
+    const dup = p.entries.length - incoming.length;
+    if(incoming.length===0){ toast('새로 합칠 내역이 없어요' + (dup?(' (이미 ' + dup + '건 포함됨)'):'')); return false; }
+    const ok = confirm('다른 기기의 ' + incoming.length + '건을 현재 목록(' + entries.length + '건)에 추가합니다.'
+      + (dup ? ('\n이미 있는 ' + dup + '건은 제외돼요.') : '')
+      + '\n\n계속할까요?');
+    if(!ok) return false;
+    const prev = entries.slice();
+    const prevNext = nextSeq;
+    pushSnapshot(makePayload());                 // 합치기 전 상태를 자동 백업에 남김
+    incoming.forEach(e=>{ e.seq = undefined; });  // 들어오는 항목은 현재 뒤에 새 순번 부여
+    entries = entries.concat(incoming);
+    reconcileSeq();
+    lastSnapSig = null;
+    persist(); renderAll();
+    showUndo(incoming.length + '건 합쳤어요 · 총 ' + entries.length + '건', '되돌리기', ()=>{
+      entries = prev; nextSeq = prevNext; reconcileSeq();
+      lastSnapSig = null; persist(); renderAll();
+      toast('되돌렸어요');
+    }, 10000);
+    return true;
+  }
+  function combineFromFile(file){
+    if(file.size > MAX_FILE){ toast('파일이 너무 커요 (8MB 초과)'); return; }
+    const reader = new FileReader();
+    reader.onload = ()=>combineData(String(reader.result||''));
+    reader.onerror = ()=>toast('파일을 읽지 못했어요');
+    reader.readAsText(file);
+  }
+
   // 스냅샷 복구 시트
   async function openSnapRestore(){
     closeMore();
@@ -1483,6 +1521,8 @@
     $('snapClose').addEventListener('click', ()=>$('snapBackdrop').classList.remove('show'));
     $('snapBackdrop').addEventListener('click', e=>{ if(e.target===$('snapBackdrop')) $('snapBackdrop').classList.remove('show'); });
 
+    $('btnCombine').addEventListener('click', ()=>{ closeMore(); $('combineInput').click(); });
+    $('combineInput').addEventListener('change', e=>{ const f = e.target.files && e.target.files[0]; if(f) combineFromFile(f); e.target.value=''; });
     $('btnPasteRestore').addEventListener('click', ()=>{ closeMore(); $('pasteArea').value=''; $('pasteBackdrop').classList.add('show'); });
     $('pasteCancel').addEventListener('click', ()=>$('pasteBackdrop').classList.remove('show'));
     $('pasteDo').addEventListener('click', ()=>{ if(applyRestore($('pasteArea').value, '붙여넣기')) $('pasteBackdrop').classList.remove('show'); });
