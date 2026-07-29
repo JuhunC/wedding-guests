@@ -1856,7 +1856,8 @@
       if(n >= 1) nextSeq = n;
     });
     $('nextIdx').addEventListener('focus', e=>e.target.select());
-    $('nextIdx').addEventListener('blur', ()=>{ if(!(nextSeq >= 1)) nextSeq = 1; updateNextIdx(); });
+    // 비워두거나 잘못된 값이면 실제 사용될 번호로 되돌린다(빈 칸인데 번호가 정해져 있는 혼란 방지)
+    $('nextIdx').addEventListener('blur', ()=>{ if(!(nextSeq >= 1)) nextSeq = 1; $('nextIdx').value = nextSeq; });
     $('nextIdx').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); $('name').focus(); }});
 
     // Enter 흐름: 이름 → 금액 → 관계 → 메모 → 추가
