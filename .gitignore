@@ -4,3 +4,6 @@
 # Editor / OS
 *.swp
 Thumbs.db
+
+# Tooling artifacts
+.playwright-mcp/
