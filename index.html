@@ -328,7 +328,12 @@
   @media (min-width: 960px){
     body{ overflow:hidden; }
     .wrap{ max-width:1280px; height:100vh; display:grid; grid-template-columns:minmax(360px,440px) 1fr; gap:30px; padding:0 24px; }
-    .col-left, .col-right{ height:100vh; overflow-y:auto; overscroll-behavior:contain; padding-bottom:calc(var(--dock-h) + 20px); }
+    .col-left{ height:100vh; overflow-y:auto; overscroll-behavior:contain; padding-bottom:24px; }
+    .col-right{ height:100vh; overflow-y:auto; overscroll-behavior:contain; padding-bottom:calc(var(--dock-h) + 20px); }
+    /* 데스크톱: 하단 도크(툴바+광고)를 오른쪽 '방명록' 칼럼 폭에 맞춰 배치 */
+    .bottom-dock{ left:var(--dock-left,0); width:var(--dock-width,100%); right:auto;
+      border-left:1px solid var(--line); border-right:1px solid var(--line);
+      border-radius:14px 14px 0 0; overflow:hidden; }
     .col-left{ padding-top:2px; padding-right:4px; }
     .col-right{ padding-top:2px; }
     header.hero{ margin-top:12px; }
@@ -665,6 +670,17 @@
     if(!dock) return;
     var h = Math.round(dock.getBoundingClientRect().height);
     if(h > 0) document.documentElement.style.setProperty('--dock-h', h + 'px');
+    // 데스크톱에서는 도크를 오른쪽 '방명록' 칼럼 폭에 맞춘다 (모바일은 전체 폭)
+    var root = document.documentElement;
+    var col = document.querySelector('.col-right');
+    if(col && window.matchMedia('(min-width:960px)').matches){
+      var r = col.getBoundingClientRect();
+      root.style.setProperty('--dock-left', Math.round(r.left) + 'px');
+      root.style.setProperty('--dock-width', Math.round(r.width) + 'px');
+    } else {
+      root.style.removeProperty('--dock-left');
+      root.style.removeProperty('--dock-width');
+    }
   }
   function revealAdBar(){ if(adBar){ adBar.hidden = false; measureDock(); } }
 
