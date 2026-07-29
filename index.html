@@ -313,12 +313,23 @@
     /* 탭에 따라 영역 표시/숨김 */
     body[data-tab="summary"] .card,
     body[data-tab="summary"] .col-right{ display:none; }
-    body[data-tab="entry"] header.hero,
     body[data-tab="entry"] .summary,
     body[data-tab="entry"] .col-right{ display:none; }
-    body[data-tab="list"] header.hero,
     body[data-tab="list"] .summary,
     body[data-tab="list"] .card{ display:none; }
+
+    /* 저장 상태 표시는 어느 탭에서도 보여야 한다(숨기면 저장 실패가 조용히 묻힘).
+       현황 탭이 아닐 땐 히어로를 얇게 접고 상태 칩만 남긴다. */
+    body[data-tab="entry"] header.hero,
+    body[data-tab="list"] header.hero{
+      display:flex; justify-content:flex-end; align-items:center;
+      margin:0; padding:8px 2px 0; min-height:0;
+      background:none; border:none; box-shadow:none; border-radius:0;
+    }
+    body[data-tab="entry"] header.hero > :not(.save-pill),
+    body[data-tab="list"] header.hero > :not(.save-pill){ display:none!important; }
+    body[data-tab="entry"] .save-pill,
+    body[data-tab="list"] .save-pill{ position:static; }
     body[data-tab="entry"] .col-left,
     body[data-tab="list"] .col-right{ padding-top:8px; }
     body[data-tab="list"] .list-head{ margin-top:4px; }
@@ -342,6 +353,12 @@
   }
 
   @media print{
+    /* 인쇄 용지 폭(~794px)이 모바일 미디어쿼리에 걸리므로, 탭 규칙을 반드시 무력화해야
+       현재 탭과 무관하게 방명록이 인쇄된다. */
+    body[data-tab] .col-right, body[data-tab] #list, body[data-tab] .list-head{ display:block!important; }
+    body[data-tab] .col-left, body[data-tab] header.hero, body[data-tab] .summary, body[data-tab] .card{ display:none!important; }
+    .bottom-dock,.tabbar,.ad-bar{ display:none!important; }
+    .row{ break-inside:avoid; page-break-inside:avoid; }
     header.hero,.summary-top,.card,.toolbar,.list-head .search,.filters,.toast-host,.backdrop,.row .edit{ display:none!important; }
     body{ background:#fff; overflow:visible; } body::before{ display:none; }
     #list{ box-shadow:none; } .row{ border-color:#ddd; }
@@ -699,19 +716,26 @@
     ins.className = 'adsbygoogle';
     ins.style.display = 'inline-block';
     ins.style.width = w + 'px'; ins.style.height = h + 'px';
+    ins.style.maxWidth = '100%';   // 가로 회전 등으로 화면이 좁아져도 넘치지 않게
     ins.setAttribute('data-ad-client', AD_CONFIG.client);
     ins.setAttribute('data-ad-slot', AD_CONFIG.slot);
     adSlot.appendChild(ins);
-    try{ (window.adsbygoogle = window.adsbygoogle || []).push(AD_CONFIG.personalizedAds ? {} : { requestNonPersonalizedAds: 1 }); }catch(e){}
+    /* 비개인화 요청은 push 객체가 아니라 adsbygoogle 배열의 속성으로 읽힌다(객체로 넘기면 무시됨) */
+    try{
+      window.adsbygoogle = window.adsbygoogle || [];
+      if(!AD_CONFIG.personalizedAds) window.adsbygoogle.requestNonPersonalizedAds = 1;
+      window.adsbygoogle.push({});
+    }catch(e){}
     revealAdBar();
     // 광고가 채워지지 않으면(미승인·미달) 빈 '광고' 칸을 보여주지 않고 숨긴다
+    /* 판정은 data-ad-status 만 신뢰한다. 광고가 없어도(unfilled) AdSense 가 iframe 을
+       넣기 때문에 iframe 존재로는 충전 여부를 알 수 없다. */
     var tries = 0;
     var poll = setInterval(function(){
       tries++;
       var st = ins.getAttribute('data-ad-status');
-      var filled = st === 'filled' || ins.querySelector('iframe');
-      if(filled){ clearInterval(poll); return; }
-      if(st === 'unfilled' || tries > 12){        // unfilled 이거나 ~6초 내 미충전
+      if(st === 'filled'){ clearInterval(poll); return; }          // 광고 표시됨 → 유지
+      if(st === 'unfilled' || tries > 12){                          // 광고 없음 또는 ~6초 무응답 → 숨김
         clearInterval(poll);
         adBar.hidden = true;
         measureDock();
@@ -802,6 +826,7 @@
   const SNAP_STORE = 'snap';
   const MAX_SNAP   = 30;
   const SNAP_TTL   = 30 * 24 * 60 * 60 * 1000;   // 자동 백업 보관 기간: 30일 (이후 자동 만료)
+  const KEEP_MIN   = 5;    // 나이와 무관하게 항상 남기는 최소 개수 — 만료가 '마지막 복구 수단'을 지우지 못하게 하는 안전선
   const LS_SNAP_MAX = 8;
   const LS_SNAP_BYTES = 300000;
   const SCHEMA = 1;
@@ -888,13 +913,15 @@
         const cutoff = Date.now() - SNAP_TTL;
         const cReq = store.count();
         cReq.onsuccess = ()=>{
-          let over = cReq.result - MAX_SNAP;          // 개수 초과분
-          const cur = store.openCursor();             // 오름차순 = 오래된 것부터
+          const total = cReq.result;
+          let over = total - MAX_SNAP;                 // 개수 초과분
+          let budget = Math.max(0, total - KEEP_MIN);  // 최신 KEEP_MIN개는 어떤 경우에도 보존
+          const cur = store.openCursor();              // 오름차순 = 오래된 것부터
           cur.onsuccess = (e)=>{
-            const c = e.target.result; if(!c) return;
+            const c = e.target.result; if(!c || budget <= 0) return;
             const rec = c.value || {};
-            if(over > 0){ c.delete(); over--; }                       // 개수 초과 → 삭제
-            else if(Number(rec.at) && Number(rec.at) < cutoff){ c.delete(); }  // 30일 경과 → 만료
+            if(over > 0){ c.delete(); over--; budget--; }                                  // 개수 초과 → 삭제
+            else if(Number(rec.at) && Number(rec.at) < cutoff){ c.delete(); budget--; }    // 30일 경과 → 만료
             c.continue();
           };
         };
@@ -932,15 +959,22 @@
   function pushSnapshot(payload){
     const sig = snapSig(payload);
     if(sig === lastSnapSig) return;          // 직전과 동일하면 생략
-    lastSnapSig = sig;
-    idbSnapPush(payload).then(ok=>{ if(!ok) lsSnapPush(payload); });
+    // 성공을 확인한 뒤에만 서명을 기록한다. 미리 기록하면 쓰기가 실패했을 때
+    // 다음 호출이 '이미 저장됨'으로 착각해 삭제 직전 안전망을 통째로 건너뛴다.
+    idbSnapPush(payload).then(ok=>{
+      if(ok){ lastSnapSig = sig; return; }
+      lsSnapPush(payload); lastSnapSig = sig;
+    });
   }
   function lsSnapPush(payload){
     try{
       let arr = []; try{ arr = JSON.parse(safeGet(BACKUP_KEY)||'[]'); }catch(e){ arr = []; }
       if(!Array.isArray(arr)) arr = [];
       const cutoff = Date.now() - SNAP_TTL;
-      arr = arr.filter(s=> !Number(s && s.at) || Number(s.at) >= cutoff);   // 30일 지난 백업 만료
+      if(arr.length > KEEP_MIN){                                            // 최신 KEEP_MIN개는 보존
+        const keep = arr.slice(-KEEP_MIN), older = arr.slice(0, -KEEP_MIN);
+        arr = older.filter(s=> !Number(s && s.at) || Number(s.at) >= cutoff).concat(keep);
+      }
       arr.push({ at:payload.savedAt, count:payload.count, nextSeq:payload.nextSeq, sig:snapSig(payload), entries:payload.entries });
       while(arr.length > LS_SNAP_MAX) arr.shift();
       let s = JSON.stringify(arr);
@@ -954,8 +988,11 @@
     try{ const l = JSON.parse(safeGet(BACKUP_KEY)||'[]'); if(Array.isArray(l)) l.forEach(s=>out.push(s)); }catch(e){}
     out.forEach(s=>{ s._entries = (Array.isArray(s.entries)?s.entries:[]).map(normalizeEntry).filter(Boolean); });
     out.sort((a,b)=>(b.at||0)-(a.at||0));
-    const cutoff = Date.now() - SNAP_TTL;                       // 30일 지난 백업은 제외
-    return out.filter(s=> s._entries.length > 0 && (!Number(s.at) || Number(s.at) >= cutoff));
+    // 기기에 실제로 남아 있는 백업은 절대 숨기지 않는다(숨겼다가 나중에 삭제 = 조용한 데이터 손실).
+    // 만료 대상은 표시만 다르게 하고, 복구는 언제나 가능해야 한다.
+    const cutoff = Date.now() - SNAP_TTL;
+    out.forEach(s=>{ s._expired = !!(Number(s.at) && Number(s.at) < cutoff); });
+    return out.filter(s=> s._entries.length > 0);
   }
 
   // ============================================================
@@ -1200,14 +1237,16 @@
     if(list.length===0){
       const li = document.createElement('li'); li.className = 'empty';
       li.innerHTML = entries.length===0
-        ? '<div class="big">✦</div>아직 기록된 축의가 없어요.<br>위에서 첫 축의를 기록해 보세요.'
+        ? '<div class="big">✦</div>아직 기록된 축의가 없어요.<br>‘새 기록’에서 첫 축의를 기록해 보세요.'
         : '<div class="big">✦</div>검색·필터에 맞는 기록이 없어요.';
       el.appendChild(li); renderRelDatalist(); return;
     }
     const frag = document.createDocumentFragment();
     for(const e of list){
       const li = document.createElement('li');
-      li.className = 'row' + (e.id===flashId ? ' flash' : '');
+      // 숨겨진 탭에서는 하이라이트를 걸지 않는다(나중에 탭을 열 때 뒤늦게 재생되는 문제)
+      const canFlash = e.id===flashId && (window.innerWidth>=960 || document.body.dataset.tab==='list');
+      li.className = 'row' + (canFlash ? ' flash' : '');
       li.dataset.id = e.id;
 
       const idx = document.createElement('span'); idx.className = 'idx';
