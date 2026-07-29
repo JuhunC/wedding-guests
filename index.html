@@ -94,8 +94,12 @@
   .hero-link:hover{ border-bottom-color:var(--gold); }
   .hero .orn-divider{ margin-top:14px; }
 
+  .card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+  .card-head .eyebrow{ margin:0; }
+  .pill-slot{ display:inline-flex; align-items:center; flex:none; }
+  .hero-slot{ position:absolute; top:12px; right:12px; }
+  .list-head .pill-slot{ margin-left:auto; }
   .save-pill{
-    position:absolute; top:12px; right:12px;
     display:inline-flex; align-items:center; gap:6px;
     font-size:11px; font-weight:600; padding:4px 9px; border-radius:999px;
     background:var(--ok-soft); color:var(--ok); white-space:nowrap; letter-spacing:.02em;
@@ -327,18 +331,10 @@
     body[data-tab="list"] .summary,
     body[data-tab="list"] .card{ display:none; }
 
-    /* 저장 상태 표시는 어느 탭에서도 보여야 한다(숨기면 저장 실패가 조용히 묻힘).
-       현황 탭이 아닐 땐 히어로를 얇게 접고 상태 칩만 남긴다. */
+    /* 히어로는 현황 탭에서만. 저장 상태 칩은 JS가 각 탭의 슬롯으로 옮겨
+       (새 기록=제목 옆, 방명록=목록 헤더) 한 줄을 차지하지 않으면서 항상 보이게 한다. */
     body[data-tab="entry"] header.hero,
-    body[data-tab="list"] header.hero{
-      display:flex; justify-content:flex-end; align-items:center;
-      margin:0; padding:8px 2px 0; min-height:0;
-      background:none; border:none; box-shadow:none; border-radius:0;
-    }
-    body[data-tab="entry"] header.hero > :not(.save-pill),
-    body[data-tab="list"] header.hero > :not(.save-pill){ display:none!important; }
-    body[data-tab="entry"] .save-pill,
-    body[data-tab="list"] .save-pill{ position:static; }
+    body[data-tab="list"] header.hero{ display:none; }
     body[data-tab="entry"] .col-left,
     body[data-tab="list"] .col-right{ padding-top:8px; }
     body[data-tab="list"] .list-head{ margin-top:4px; }
@@ -399,7 +395,7 @@
   <div class="col-left">
   <!-- 헤더 (청첩장 크레스트) -->
   <header class="hero">
-    <span class="save-pill" id="savePill"><span class="dot"></span><span id="saveText">준비됨</span></span>
+    <span class="pill-slot hero-slot" id="pillSlotHero"></span>
     <svg class="crest" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
       <circle cx="60" cy="60" r="55" fill="none" stroke-width=".75"/>
       <circle cx="60" cy="60" r="47" fill="none" stroke-width="1.25"/>
@@ -464,7 +460,12 @@
 
   <!-- 입력 카드 -->
   <div class="card">
-    <span class="eyebrow ko">새 축의 기록</span>
+    <div class="card-head">
+      <span class="eyebrow ko">새 축의 기록</span>
+      <span class="pill-slot" id="pillSlotEntry">
+        <span class="save-pill" id="savePill"><span class="dot"></span><span id="saveText">준비됨</span></span>
+      </span>
+    </div>
     <div class="side-toggle" id="sideToggle">
       <button type="button" data-side="groom" class="g"><span class="sd"></span>신랑측</button>
       <button type="button" data-side="bride" class="b"><span class="sd"></span>신부측</button>
@@ -522,6 +523,7 @@
   <div class="list-head">
     <span class="eyebrow ko">방명록</span>
     <span class="count" id="listCount">0건</span>
+    <span class="pill-slot" id="pillSlotList"></span>
     <div class="search">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
       <input id="search" type="search" placeholder="이름·소속·메모 검색" autocomplete="off">
@@ -1637,9 +1639,22 @@
   // ============================================================
   //  더보기 / 시트 열고닫기
   // ============================================================
+  // 저장 상태 칩을 현재 보이는 영역으로 옮긴다 — 어느 탭에서도 저장 실패가 묻히지 않게.
+  function movePill(){
+    const pill = $('savePill'); if(!pill) return;
+    const tab = document.body.dataset.tab;
+    let target = $('pillSlotEntry');                       // 기본: '새 축의 기록' 제목 옆
+    if(window.innerWidth < 960){
+      if(tab === 'summary') target = $('pillSlotHero');     // 현황 탭: 히어로 우상단
+      else if(tab === 'list') target = $('pillSlotList');   // 방명록 탭: 목록 헤더
+    }
+    if(target && pill.parentElement !== target) target.appendChild(pill);
+  }
+
   // 모바일 탭 전환 (데스크톱은 2단 레이아웃이라 CSS가 무시)
   function setTab(name){
     document.body.dataset.tab = name;
+    movePill();
     document.querySelectorAll('#tabbar button[data-tab]').forEach(b=>{
       const on = b.dataset.tab === name;
       b.classList.toggle('on', on);
@@ -1800,6 +1815,7 @@
     $('mExcel').addEventListener('click', ()=>{ closeMore(); exportCSV(); });
     $('mBackup').addEventListener('click', ()=>{ closeMore(); exportBackup(); });
     $('mRestore').addEventListener('click', ()=>{ closeMore(); $('fileInput').click(); });
+    window.addEventListener('resize', movePill);   // 모바일↔데스크톱 전환 시 칩 위치 재배치
     // 시트 쓸어내려 닫기
     enableSheetDrag('editBackdrop', ()=>{ editingId = null; });
     enableSheetDrag('moreBackdrop');
