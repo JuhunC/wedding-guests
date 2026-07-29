@@ -364,6 +364,14 @@
   @media print{
     /* 인쇄 용지 폭(~794px)이 모바일 미디어쿼리에 걸리므로, 탭 규칙을 반드시 무력화해야
        현재 탭과 무관하게 방명록이 인쇄된다. */
+    /* 다크 모드에서 인쇄하면 밝은 글자가 흰 종이에 보이지 않으므로 인쇄용 밝은 팔레트로 고정 */
+    :root{
+      --bg:#ffffff; --panel:#ffffff; --ink:#1d1a15; --muted:#5a5348; --line:#c9c2b4;
+      --brand:#6f7f68; --brand-strong:#3d4a35; --brand-soft:#eef1e8; --gold:#9a7b2f;
+      --groom:#5c7f9c; --groom-strong:#284a63; --groom-soft:#eef3f7;
+      --bride:#b07185; --bride-strong:#7a2f45; --bride-soft:#f8edf1;
+    }
+    .consent{ display:none!important; }        /* 동의 배너는 인쇄물에 나오지 않게 */
     /* 인쇄물 구성: 제목 → 축의 현황(요약) → 방명록 */
     body[data-tab] .col-left, body[data-tab] .summary,
     body[data-tab] .col-right, body[data-tab] #list, body[data-tab] .list-head{ display:block!important; }
