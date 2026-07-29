@@ -167,12 +167,13 @@
   /* 번호 배지 — 방명록 행의 번호와 동일한 형태를 입력/수정 화면에서도 사용 */
   .name-row{ display:flex; align-items:center; gap:10px; }
   .name-row > input:not(.next-idx){ flex:1; min-width:0; }
-  .next-idx{ flex:none; width:46px; height:46px; border-radius:50%;
-    border:1px solid var(--gold); text-align:center; padding:0;
-    font-family:var(--display); font-size:15px; color:var(--ink);
+  /* .field input 보다 우선하도록 특이도를 높인다(안 그러면 원형이 사각형으로 덮어써짐) */
+  .name-row input.next-idx{ flex:none; width:46px; min-width:46px; height:46px; min-height:46px;
+    border-radius:50%; border:1px solid var(--gold); text-align:center; padding:0;
+    font-family:var(--display); font-size:16px; font-weight:600; color:var(--ink);
     font-variant-numeric:tabular-nums; background:transparent; outline:none;
     -webkit-appearance:none; appearance:none; }
-  .next-idx:focus{ border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft); background:var(--bg); }
+  .name-row input.next-idx:focus{ border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft); background:var(--bg); }
 
   .amount-wrap{ position:relative; }
   .amount-wrap input{ padding-right:48px; }
