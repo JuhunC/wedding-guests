@@ -364,9 +364,15 @@
   @media print{
     /* 인쇄 용지 폭(~794px)이 모바일 미디어쿼리에 걸리므로, 탭 규칙을 반드시 무력화해야
        현재 탭과 무관하게 방명록이 인쇄된다. */
+    /* 인쇄물 구성: 제목 → 축의 현황(요약) → 방명록 */
+    body[data-tab] .col-left, body[data-tab] .summary,
     body[data-tab] .col-right, body[data-tab] #list, body[data-tab] .list-head{ display:block!important; }
-    body[data-tab] .col-left, body[data-tab] header.hero, body[data-tab] .summary, body[data-tab] .card{ display:none!important; }
+    body[data-tab] header.hero, body[data-tab] .card{ display:none!important; }
     .bottom-dock,.tabbar,.ad-bar{ display:none!important; }
+    .stat-grid{ display:grid!important; grid-template-columns:1fr 1fr!important; gap:8px!important; }
+    .split, .breakdown{ display:grid!important; grid-template-columns:1fr 1fr!important; gap:8px!important; }
+    .summary{ break-inside:avoid; page-break-inside:avoid; margin:0 0 16px!important; padding:0!important; }
+    .stat,.sidecard,.mini{ box-shadow:none!important; border-color:#ddd!important; }
     .row{ break-inside:avoid; page-break-inside:avoid; }
     header.hero,.summary-top,.card,.toolbar,.list-head .search,.filters,.toast-host,.backdrop,.row .edit{ display:none!important; }
     body{ background:#fff; overflow:visible; } body::before{ display:none; }
