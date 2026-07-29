@@ -156,7 +156,14 @@
   .quick button{ padding:11px 4px; border-radius:999px; border:1px solid var(--line); background:var(--panel);
     font-family:var(--num); font-size:14px; font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums; }
   .quick button:active{ background:var(--brand-soft); }
-  .quick button.clear{ grid-column:1/-1; border-radius:10px; color:var(--muted); font-family:var(--body); font-weight:600; }
+
+  .amount-wrap{ position:relative; }
+  .amount-wrap input{ padding-right:48px; }
+  .amt-clear{ position:absolute; right:9px; top:50%; transform:translateY(-50%);
+    width:30px; height:30px; border-radius:50%; border:none; background:var(--line); color:var(--muted);
+    font-size:14px; line-height:1; display:none; align-items:center; justify-content:center; padding:0; }
+  .amt-clear.show{ display:flex; }
+  .amt-clear:active{ background:var(--brand-soft); color:var(--brand-strong); }
 
   .chips{ display:grid; grid-template-columns:repeat(6,1fr); gap:7px; }
   .chips button{ padding:12px 4px; border-radius:10px; border:1px solid var(--line); background:var(--bg);
@@ -423,18 +430,16 @@
     </div>
     <div class="field">
       <label for="amount">축의금 (원)</label>
-      <input id="amount" type="text" inputmode="numeric" autocomplete="off" placeholder="0" enterkeyhint="done">
+      <div class="amount-wrap">
+        <input id="amount" type="text" inputmode="numeric" autocomplete="off" placeholder="0" enterkeyhint="done">
+        <button type="button" class="amt-clear" id="amtClear" data-clear="1" aria-label="금액 지우기">✕</button>
+      </div>
       <div class="amt-read" id="amtRead"></div>
       <div class="quick" id="quick">
         <button type="button" data-add="10000">+1만</button>
         <button type="button" data-add="30000">+3만</button>
         <button type="button" data-add="50000">+5만</button>
         <button type="button" data-add="100000">+10만</button>
-        <button type="button" data-add="150000">+15만</button>
-        <button type="button" data-add="200000">+20만</button>
-        <button type="button" data-add="300000">+30만</button>
-        <button type="button" data-add="500000">+50만</button>
-        <button type="button" class="clear" data-clear="1">지움</button>
       </div>
     </div>
     <div class="field">
@@ -1232,7 +1237,11 @@
     filter.side = f;
     document.querySelectorAll('#sideFilter button').forEach(b=>b.classList.toggle('on', b.dataset.f===f));
   }
-  function updateAmtRead(){ const v = parseAmount($('amount').value); $('amtRead').textContent = v ? toKorean(v) : ''; }
+  function updateAmtRead(){
+    const v = parseAmount($('amount').value);
+    $('amtRead').textContent = v ? toKorean(v) : '';
+    $('amtClear').classList.toggle('show', $('amount').value.trim() !== '');   // 값 있을 때만 ✕ 표시
+  }
   function setInputTickets(n){
     inputTickets = n;
     document.querySelectorAll('#ticketChips button').forEach(b=>b.classList.toggle('on', Number(b.dataset.tk)===n));
@@ -1608,10 +1617,11 @@
 
     $('quick').addEventListener('click', e=>{
       const b = e.target.closest('button'); if(!b) return;
-      if(b.dataset.clear){ $('amount').value=''; }
-      else { const cur = parseAmount($('amount').value); $('amount').value = (cur+Number(b.dataset.add)).toLocaleString('ko-KR'); }
+      const cur = parseAmount($('amount').value);
+      $('amount').value = (cur + Number(b.dataset.add)).toLocaleString('ko-KR');
       updateAmtRead();
     });
+    $('amtClear').addEventListener('click', ()=>{ $('amount').value=''; updateAmtRead(); $('amount').focus(); });
     $('amount').addEventListener('input', updateAmtRead);
     $('amount').addEventListener('blur', ()=>{ const v=parseAmount($('amount').value); $('amount').value = v ? v.toLocaleString('ko-KR') : ''; });
 

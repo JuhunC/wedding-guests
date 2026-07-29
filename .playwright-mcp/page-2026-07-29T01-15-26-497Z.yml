@@ -1,0 +1,99 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - banner [ref=e4]:
+        - generic [ref=e5]: 준비됨
+        - img [ref=e8]:
+          - generic [ref=e14]: 囍
+        - generic [ref=e15]: 축의대
+        - generic [ref=e16]: 소중한 마음을 기록합니다
+        - link "www.축의대.com" [ref=e17] [cursor=pointer]:
+          - /url: https://축의대.com
+      - generic [ref=e34]:
+        - generic [ref=e35]: 축의 현황
+        - generic [ref=e37]:
+          - generic [ref=e38]:
+            - generic [ref=e39]: 총 축의금
+            - generic [ref=e40]: 0원
+            - generic [ref=e42]: 0원
+          - generic [ref=e43]:
+            - generic [ref=e44]: 총 건수
+            - generic [ref=e45]: 0 명
+            - generic [ref=e46]: 평균 0원
+          - generic [ref=e47]:
+            - generic [ref=e48]: 식권
+            - generic [ref=e49]: 0장
+            - generic [ref=e50]: 답례 식권 합계
+          - generic [ref=e51]:
+            - generic [ref=e54]:
+              - generic [ref=e55]: 신랑측 0명
+              - generic [ref=e56]: 0원
+            - generic [ref=e59]:
+              - generic [ref=e60]: 신부측 0명
+              - generic [ref=e61]: 0원
+      - generic [ref=e62]:
+        - generic [ref=e63]: 새 축의 기록
+        - generic [ref=e64]:
+          - button "신랑측" [ref=e65] [cursor=pointer]
+          - button "신부측" [ref=e67] [cursor=pointer]
+        - generic [ref=e69]:
+          - generic [ref=e70]: 이름
+          - textbox "이름" [ref=e71]:
+            - /placeholder: "예: 김철수"
+        - generic [ref=e72]:
+          - generic [ref=e73]: 축의금 (원)
+          - textbox "축의금 (원)" [ref=e75]:
+            - /placeholder: "0"
+          - generic [ref=e77]:
+            - button "+1만" [ref=e78] [cursor=pointer]
+            - button "+3만" [ref=e79] [cursor=pointer]
+            - button "+5만" [ref=e80] [cursor=pointer]
+            - button "+10만" [ref=e81] [cursor=pointer]
+        - generic [ref=e82]:
+          - generic [ref=e83]: 식권
+          - group "식권 개수" [ref=e84]:
+            - button "0개" [ref=e85] [cursor=pointer]
+            - button "1개" [ref=e86] [cursor=pointer]
+            - button "2개" [ref=e87] [cursor=pointer]
+            - button "3개" [ref=e88] [cursor=pointer]
+            - button "5개" [ref=e89] [cursor=pointer]
+            - textbox "식권 직접 입력" [ref=e90]:
+              - /placeholder: 직접
+        - generic [ref=e91]:
+          - generic [ref=e92]:
+            - generic [ref=e93]: 관계 / 소속 (선택)
+            - combobox "관계 / 소속 (선택)" [ref=e94]
+          - generic [ref=e95]:
+            - generic [ref=e96]: 메모 (선택)
+            - textbox "메모 (선택)" [ref=e97]:
+              - /placeholder: "예: 화환, 답례품"
+        - button "기록하기" [ref=e98] [cursor=pointer]
+    - generic [ref=e99]:
+      - generic [ref=e100]:
+        - generic [ref=e101]: 방명록
+        - generic [ref=e102]: 0건
+        - searchbox "이름·소속·메모 검색" [ref=e107]
+        - generic [ref=e108]:
+          - generic [ref=e109]:
+            - button "전체" [ref=e110] [cursor=pointer]
+            - button "신랑측" [ref=e111] [cursor=pointer]
+            - button "신부측" [ref=e112] [cursor=pointer]
+          - combobox "정렬" [ref=e113]:
+            - option "최근 입력순" [selected]
+            - option "오래된순"
+            - option "금액 높은순"
+            - option "이름순"
+      - list [ref=e114]
+  - generic [ref=e117]:
+    - button "엑셀 공유" [ref=e118] [cursor=pointer]
+    - button "백업" [ref=e122] [cursor=pointer]
+    - button "복원" [ref=e127] [cursor=pointer]
+    - button "더보기" [ref=e131] [cursor=pointer]
+  - generic [ref=e137]:
+    - paragraph [ref=e138]:
+      - text: 원활한 서비스와 광고 표시를 위해 쿠키가 사용될 수 있어요. 입력하신 축의 데이터는 이 기기에만 저장되며 서버로 전송되지 않습니다.
+      - link "개인정보 처리방침" [ref=e139] [cursor=pointer]:
+        - /url: privacy.html
+    - generic [ref=e140]:
+      - button "거부" [ref=e141] [cursor=pointer]
+      - button "동의" [ref=e142] [cursor=pointer]
