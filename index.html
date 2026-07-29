@@ -704,6 +704,19 @@
     adSlot.appendChild(ins);
     try{ (window.adsbygoogle = window.adsbygoogle || []).push(AD_CONFIG.personalizedAds ? {} : { requestNonPersonalizedAds: 1 }); }catch(e){}
     revealAdBar();
+    // 광고가 채워지지 않으면(미승인·미달) 빈 '광고' 칸을 보여주지 않고 숨긴다
+    var tries = 0;
+    var poll = setInterval(function(){
+      tries++;
+      var st = ins.getAttribute('data-ad-status');
+      var filled = st === 'filled' || ins.querySelector('iframe');
+      if(filled){ clearInterval(poll); return; }
+      if(st === 'unfilled' || tries > 12){        // unfilled 이거나 ~6초 내 미충전
+        clearInterval(poll);
+        adBar.hidden = true;
+        measureDock();
+      }
+    }, 500);
     return true;
   }
   function showDemo(){
