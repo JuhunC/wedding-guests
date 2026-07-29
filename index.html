@@ -164,6 +164,14 @@
     font-family:var(--num); font-size:14px; font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums; }
   .quick button:active{ background:var(--brand-soft); }
 
+  /* 이름 왼쪽의 '다음 번호' 배지 — 명부 행의 번호와 같은 모양 */
+  .name-row{ display:flex; align-items:center; gap:9px; }
+  .name-row input{ flex:1; min-width:0; }
+  .next-idx{ flex:none; width:38px; height:38px; border-radius:50%; border:1px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--display); font-size:15px; color:var(--ink);
+    font-variant-numeric:tabular-nums; background:var(--panel); }
+
   .amount-wrap{ position:relative; }
   .amount-wrap input{ padding-right:48px; }
   .amt-clear{ position:absolute; right:9px; top:50%; transform:translateY(-50%);
@@ -183,6 +191,8 @@
   .chips .tk-custom:focus{ border-color:var(--brand); box-shadow:0 0 0 3px var(--brand-soft); }
 
   .two{ display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+  .row-seq{ display:grid; grid-template-columns:92px 1fr; gap:9px; }
+  #editSeq{ font-family:var(--display); text-align:center; font-variant-numeric:tabular-nums; }
 
   .add-btn{ width:100%; min-height:56px; margin-top:14px; border:none; border-radius:12px;
     background:var(--brand-strong); color:var(--on-accent); font-size:17px; font-weight:600; letter-spacing:.14em;
@@ -493,7 +503,10 @@
     </div>
     <div class="field">
       <label for="name">이름</label>
-      <input id="name" type="text" autocomplete="off" placeholder="예: 김철수" enterkeyhint="next">
+      <div class="name-row">
+        <span class="next-idx" id="nextIdx" title="이번에 기록될 번호" aria-label="다음 번호">1</span>
+        <input id="name" type="text" autocomplete="off" placeholder="예: 김철수" enterkeyhint="next">
+      </div>
     </div>
     <div class="field">
       <label for="amount">축의금 (원)</label>
@@ -603,7 +616,10 @@
       <button type="button" data-side="groom" class="g"><span class="sd"></span>신랑측</button>
       <button type="button" data-side="bride" class="b"><span class="sd"></span>신부측</button>
     </div>
-    <div class="field"><label>이름</label><input id="editName" type="text" autocomplete="off"></div>
+    <div class="row-seq">
+      <div class="field"><label>번호</label><input id="editSeq" type="text" inputmode="numeric" autocomplete="off"></div>
+      <div class="field"><label>이름</label><input id="editName" type="text" autocomplete="off"></div>
+    </div>
     <div class="field"><label>축의금 (원)</label><input id="editAmount" type="text" inputmode="numeric" autocomplete="off"><div class="amt-read" id="editAmtRead"></div></div>
     <div class="two">
       <div class="field"><label>관계 / 소속</label><input id="editRelation" type="text" autocomplete="off" list="relList"></div>
@@ -620,7 +636,7 @@
         <input id="editTicketCustom" class="tk-custom" type="text" inputmode="numeric" autocomplete="off" placeholder="직접" aria-label="식권 직접 입력">
       </div>
     </div>
-    <p class="hint">이름과 금액을 모두 비우면 저장할 수 없어요. 순번은 수정해도 바뀌지 않습니다.</p>
+    <p class="hint">이름과 금액을 모두 비우면 저장할 수 없어요. 번호는 직접 바꿀 수 있고(다른 번호와 겹칠 수 없음), 내용만 고칠 땐 그대로 유지됩니다.</p>
     <div class="modal-actions">
       <button class="btn-del" id="editDelete">삭제</button>
       <button class="btn-cancel" id="editCancel">취소</button>
@@ -1338,7 +1354,8 @@
     const dl = $('relList'); dl.innerHTML = '';
     for(const r of top){ const o = document.createElement('option'); o.value = r; dl.appendChild(o); }
   }
-  function renderAll(flashId){ renderStats(); renderList(flashId); }
+  function updateNextIdx(){ const el = $('nextIdx'); if(el) el.textContent = nextSeq; }
+  function renderAll(flashId){ renderStats(); renderList(flashId); updateNextIdx(); }
 
   // ============================================================
   //  입력 카드
@@ -1400,6 +1417,7 @@
     editingId = id;
     editSide = e.side || '';
     document.querySelectorAll('#editSideToggle button').forEach(b=>b.classList.toggle('on', !!e.side && b.dataset.side===e.side));
+    $('editSeq').value = (e.seq != null) ? e.seq : '';
     $('editName').value = e.name;
     $('editAmount').value = e.amount ? e.amount.toLocaleString('ko-KR') : '';
     $('editRelation').value = e.relation;
@@ -1416,6 +1434,15 @@
     const name = $('editName').value.trim().slice(0,80);
     const amount = parseAmount($('editAmount').value);
     if(!name && !amount){ toast('이름 또는 금액을 입력하세요'); return; }   // 빈 항목 저장 차단
+    // 번호(직접 수정 가능). 1 이상 정수 + 다른 항목과 중복 불가
+    const seqRaw = String($('editSeq').value).replace(/[^0-9]/g,'');
+    const newSeq = seqRaw ? parseInt(seqRaw, 10) : 0;
+    if(!newSeq || newSeq < 1){ toast('번호는 1 이상의 숫자여야 해요'); return; }
+    if(newSeq !== e.seq && entries.some(x=> x !== e && x.seq === newSeq)){
+      toast(newSeq + '번은 이미 사용 중이에요'); return;
+    }
+    e.seq = newSeq;
+    nextSeq = Math.max(nextSeq, newSeq + 1);       // 다음 번호가 겹치지 않도록
     e.name = name; e.amount = amount; e.side = editSide;
     e.tickets = editTickets;
     e.relation = $('editRelation').value.trim().slice(0,60);
