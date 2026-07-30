@@ -360,7 +360,42 @@
   .site-content strong{ font-weight:700; }
   .site-content em{ font-style:normal; color:var(--brand-strong); font-weight:600; }
   .site-content a{ color:var(--brand-strong); font-weight:600; }
-  .guide-links li{ margin-bottom:8px; }
+  .site-content .lead{ text-align:center; font-family:var(--display); font-size:1.02rem;
+    line-height:2.1; color:var(--ink); margin:14px 0 4px; letter-spacing:.01em; }
+  .site-content .orn-divider{ margin:20px 0 6px; }
+  .site-content .steps{ counter-reset:st; list-style:none; padding-left:0; }
+  .site-content .steps li{ position:relative; padding-left:30px; margin-bottom:11px; }
+  .site-content .steps li::before{ counter-increment:st; content:counter(st);
+    position:absolute; left:0; top:2px; width:20px; height:20px; border-radius:50%;
+    border:1px solid var(--gold); color:var(--gold); font-family:var(--display); font-size:11px;
+    display:flex; align-items:center; justify-content:center; }
+  .site-content .feats{ list-style:none; padding-left:0; }
+  .site-content .feats li{ padding-left:16px; position:relative; margin-bottom:9px; }
+  .site-content .feats li::before{ content:"·"; position:absolute; left:2px; color:var(--gold); font-weight:700; }
+
+  /* 가이드 카드 — 청첩장 결 */
+  .guides{ margin:22px 0 8px; padding:26px 18px 24px; text-align:center;
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); }
+  .guides-eyebrow{ font-family:var(--display); font-size:.68rem; letter-spacing:.24em; text-indent:.24em;
+    text-transform:uppercase; color:var(--muted); }
+  .guides-title{ font-family:var(--display); font-size:1.24rem; font-weight:400; letter-spacing:.03em;
+    margin:8px 0 6px; color:var(--ink); }
+  .guides-lead{ font-size:.86rem; line-height:1.95; color:var(--muted); margin:0; }
+  .guide-grid{ display:grid; gap:9px; margin-top:16px; text-align:left; }
+  @media (min-width:620px){ .guide-grid{ grid-template-columns:1fr 1fr; } }
+  .guide-card{ display:block; position:relative; padding:15px 16px 15px 46px;
+    background:var(--bg); border:1px solid var(--line); border-radius:12px;
+    text-decoration:none; transition:border-color .15s, transform .12s; }
+  .guide-card:hover{ border-color:var(--gold); }
+  .guide-card:active{ transform:translateY(1px); }
+  .gc-num{ position:absolute; left:14px; top:16px; width:22px; height:22px; border-radius:50%;
+    border:1px solid var(--gold); color:var(--gold); font-family:var(--display); font-size:11px;
+    display:flex; align-items:center; justify-content:center; }
+  .guide-card strong{ display:block; font-family:var(--display); font-size:.98rem; font-weight:400;
+    letter-spacing:.01em; color:var(--ink); line-height:1.5; }
+  .gc-desc{ display:block; margin-top:4px; font-size:.79rem; line-height:1.7; color:var(--muted); }
+  .guides .site-foot{ margin-top:22px; padding-top:15px; border-top:1px solid var(--line);
+    text-align:center; font-size:.82rem; color:var(--muted); }
   .site-foot{ margin-top:22px!important; padding-top:14px; border-top:1px solid var(--line);
     text-align:center; font-size:.84rem!important; color:var(--muted)!important; }
 
@@ -441,7 +476,7 @@
       --groom:#5c7f9c; --groom-strong:#284a63; --groom-soft:#eef3f7;
       --bride:#b07185; --bride-strong:#7a2f45; --bride-soft:#f8edf1;
     }
-    .consent, .site-content{ display:none!important; }   /* 동의 배너·안내 본문은 인쇄물에서 제외 */
+    .consent, .site-content, .guides{ display:none!important; }   /* 동의 배너·안내 본문은 인쇄물에서 제외 */
     /* 인쇄물 구성: 제목 → 축의 현황(요약) → 방명록 */
     body[data-tab] .col-left, body[data-tab] .summary,
     body[data-tab] .col-right, body[data-tab] #list, body[data-tab] .list-head{ display:block!important; }
@@ -597,63 +632,103 @@
 
   <!-- 사이트 본문: 축의대를 처음 맡은 분을 위한 안내 -->
   <section class="site-content">
-    <h1>결혼식 축의금 접수, 축의대에서 바로 기록하세요</h1>
-    <p>
-      결혼식 축의대(접수대)는 하객이 가장 몰리는 예식 20~30분 전에 정신없이 바빠집니다.
-      봉투를 받고, 이름을 확인하고, 식권을 드리고, 다음 분을 맞이하는 일이 몇 초 안에 반복되죠.
-      이 과정에서 이름을 못 적거나 금액을 잘못 세는 일이 생기면 예식이 끝난 뒤에 바로잡기가 무척 어렵습니다.
-      축의대는 그 순간에 쓰라고 만든 무료 웹앱입니다. 설치할 것도, 가입할 것도 없이 링크만 열면 바로 기록을 시작할 수 있습니다.
+    <h1>결혼식 축의금 접수, 축의대에서 마음까지 기록합니다</h1>
+
+    <p class="lead">
+      봉투에 담겨 오는 것은 숫자가 아니라 마음입니다.<br>
+      먼 길을 달려온 사람, 오랜만에 얼굴을 보여 준 사람.<br>
+      그 이름들이 잊히지 않도록, 받는 그 자리에서 적어 둡니다.
     </p>
 
-    <h2>이렇게 사용합니다</h2>
-    <ol>
-      <li><strong>신랑측 · 신부측을 고릅니다.</strong> 한 번 골라두면 다음 입력에도 그대로 유지돼서, 한쪽 접수만 계속 받을 때 편합니다.</li>
-      <li><strong>이름과 금액을 넣습니다.</strong> 금액은 10만원이 기본으로 채워져 있고, <em>+1만 · +5만 · +10만 · +50만</em> 버튼으로 더할 수 있습니다.</li>
-      <li><strong>식권 개수를 고릅니다.</strong> 0~5개 버튼이 있고, 그 외 숫자는 직접 입력하면 됩니다.</li>
-      <li><strong>기록하기를 누릅니다.</strong> 손님마다 번호가 순서대로 붙고, 이 번호는 내용을 고쳐도 그대로 유지됩니다.</li>
-      <li><strong>예식이 끝나면 정산합니다.</strong> 총액과 인원, 신랑측·신부측 합계, 식권 합계를 한 화면에서 확인하고 엑셀이나 인쇄물로 남깁니다.</li>
-    </ol>
+    <div class="orn-divider">
+      <svg class="orn" viewBox="0 0 34 12" aria-hidden="true"><path d="M17 1 L23 6 L17 11 L11 6 Z"/><circle cx="17" cy="6" r="1.1"/><circle cx="4" cy="6" r="1"/><circle cx="30" cy="6" r="1"/></svg>
+    </div>
 
-    <h2>축의대의 특징</h2>
-    <ul>
-      <li><strong>하객 수 제한이 없습니다.</strong> 몇 명을 기록하든 제한을 두지 않습니다.</li>
-      <li><strong>가입도 로그인도 없습니다.</strong> 이름이나 연락처를 요구하지 않습니다.</li>
-      <li><strong>인터넷이 끊겨도 작동합니다.</strong> 예식장 지하나 신호가 약한 곳에서도 한 번 열어두면 계속 쓸 수 있습니다.</li>
-      <li><strong>신랑측·신부측을 나눠서 집계합니다.</strong> 두 접수대에서 따로 받은 기록을 나중에 하나로 합칠 수도 있습니다.</li>
-      <li><strong>식권 개수를 함께 기록합니다.</strong> 예식장과 식대를 정산할 때 몇 장이 나갔는지 바로 확인할 수 있습니다.</li>
-      <li><strong>엑셀·인쇄로 남길 수 있습니다.</strong> 명단과 합계가 담긴 정산서를 혼주께 그대로 전달하기 좋습니다.</li>
+    <h2>세 번의 손짓이면 됩니다</h2>
+    <ol class="steps">
+      <li><strong>신랑측인지 신부측인지 고릅니다.</strong> 한 번 고르면 그대로 유지되어, 한쪽 접수만 계속 받을 때 편합니다.</li>
+      <li><strong>이름과 금액을 넣습니다.</strong> 10만원이 미리 적혀 있고, 버튼으로 더하거나 직접 고쳐도 됩니다.</li>
+      <li><strong>기록하기를 누릅니다.</strong> 손님마다 번호가 차례로 붙고, 내용을 고쳐도 그 번호는 그대로 남습니다.</li>
+    </ol>
+    <p>
+      식권은 0개부터 5개까지 버튼으로 고르고, 그 밖의 숫자는 직접 적으면 됩니다.
+      예식이 끝나면 총액과 인원, 신랑측·신부측 합계, 식권 수가 한 화면에 모입니다.
+    </p>
+
+    <h2>바쁜 손을 위해 만들었습니다</h2>
+    <ul class="feats">
+      <li><strong>하객 수에 제한이 없습니다</strong> — 몇 분이 오시든 끝까지 적을 수 있습니다.</li>
+      <li><strong>가입도 로그인도 없습니다</strong> — 링크를 열면 그것으로 준비가 끝납니다.</li>
+      <li><strong>인터넷이 끊겨도 괜찮습니다</strong> — 예식장 지하에서도 기록은 이어집니다.</li>
+      <li><strong>두 접수대를 하나로 모읍니다</strong> — 신랑측과 신부측이 따로 적어도 나중에 합쳐집니다.</li>
+      <li><strong>엑셀과 인쇄로 남습니다</strong> — 명단과 합계를 그대로 혼주께 전해 드릴 수 있습니다.</li>
     </ul>
 
-    <h2>데이터는 어디에 저장되나요</h2>
+    <h2>기록은 이 기기에만 남습니다</h2>
     <p>
-      입력한 명단은 <strong>서버로 전송되지 않습니다.</strong> 사용하는 기기의 브라우저 안에만 저장되며,
-      운영자는 하객 이름이나 금액을 볼 수 없습니다. 대신 기록이 사라지지 않도록 기기 안에서 세 겹으로 저장합니다.
-      기본 저장소와 보조 저장소에 동시에 기록하고, 입력할 때마다 자동 백업을 최대 30개까지 따로 남깁니다.
-      실수로 지웠거나 목록이 보이지 않을 때는 <em>공유·더보기 → 자동 백업에서 복구</em>에서 되돌릴 수 있습니다.
-      기기를 바꾸거나 브라우저 데이터를 지우면 기록도 함께 사라지므로, 예식이 끝나면 엑셀이나 백업 파일로 한 번 더 보관하시길 권합니다.
+      입력한 명단은 서버로 전송되지 않습니다. 쓰고 계신 기기 안에만 저장되고,
+      만든 사람도 하객의 이름이나 금액을 볼 수 없습니다.
+    </p>
+    <p>
+      대신 사라지지 않는 것을 가장 중요하게 여겼습니다. 기기 안 두 곳에 동시에 저장하고,
+      입력할 때마다 자동 백업을 서른 개까지 따로 남깁니다. 실수로 지웠다면
+      <em>공유·더보기 → 자동 백업에서 복구</em>로 되돌릴 수 있습니다.
+      다만 브라우저 기록을 지우면 함께 사라지니, 예식이 끝나면 엑셀이나 백업 파일로 한 번 더 남겨 두세요.
     </p>
 
     <h2>자주 묻는 질문</h2>
     <h3>앱을 설치해야 하나요?</h3>
-    <p>아니요. 브라우저에서 주소만 열면 바로 쓸 수 있습니다. 홈 화면에 추가해두면 앱처럼 열리고, 오프라인에서도 실행됩니다.</p>
+    <p>아니요. 주소만 열면 바로 쓸 수 있습니다. 홈 화면에 추가해 두면 앱처럼 열리고 오프라인에서도 실행됩니다.</p>
     <h3>인터넷이 안 되는 예식장에서도 되나요?</h3>
-    <p>됩니다. 한 번 접속해두면 이후에는 신호가 없어도 기록할 수 있습니다. 입력 자체가 인터넷을 쓰지 않기 때문입니다.</p>
-    <h3>두 사람이 신랑측·신부측을 따로 받았는데 합칠 수 있나요?</h3>
-    <p>가능합니다. 각자 <em>엑셀 저장</em>으로 파일을 만든 뒤, 한쪽 기기에서 <em>공유·더보기 → 다른 기기 데이터 합치기</em>로 상대방 파일을 불러오면 하나의 명단이 됩니다. 번호는 겹치지 않게 자동으로 다시 매겨집니다.</p>
+    <p>됩니다. 한 번 열어두면 이후에는 신호가 없어도 기록됩니다. 입력 자체가 인터넷을 쓰지 않습니다.</p>
+    <h3>두 사람이 따로 받았는데 합칠 수 있나요?</h3>
+    <p>각자 <em>엑셀 저장</em>으로 파일을 만든 뒤, 한쪽에서 <em>다른 기기 데이터 합치기</em>로 상대 파일을 불러오면 하나가 됩니다. 번호는 겹치지 않게 다시 매겨집니다.</p>
     <h3>손님 번호를 바꿀 수 있나요?</h3>
-    <p>바꿀 수 있습니다. 목록에서 항목을 눌러 번호를 직접 고칠 수 있고, 이미 쓰고 있는 번호와 겹치면 저장되지 않습니다. 이름이나 금액만 수정할 때는 번호가 그대로 유지됩니다.</p>
+    <p>목록에서 항목을 눌러 번호를 고칠 수 있습니다. 이미 쓰는 번호와 겹치면 저장되지 않고, 이름이나 금액만 고칠 때는 번호가 그대로 유지됩니다.</p>
     <h3>정말 무료인가요?</h3>
-    <p>네. 기능 제한이나 사용 기간 제한 없이 무료로 쓸 수 있습니다. 운영은 광고로 유지합니다.</p>
+    <p>네. 기능이나 기간 제한 없이 무료입니다. 운영은 광고로 유지합니다.</p>
+  </section>
 
-    <h2>축의대 준비에 도움이 되는 글</h2>
-    <ul class="guide-links">
-      <li><a href="guide/chukui-desk-checklist.html">축의대 담당자 당일 체크리스트 — 처음 맡았다면</a></li>
-      <li><a href="guide/chukui-jeopsu-order.html">축의금 접수 순서 A to Z — 봉투 받기부터 정산까지</a></li>
-      <li><a href="guide/chukui-jeongri-methods.html">축의금 정리 방법 비교 — 수기 장부, 엑셀, 앱</a></li>
-      <li><a href="guide/sinrang-sinbu-hapchigi.html">신랑측·신부측 따로 받고 나중에 합치는 방법</a></li>
-      <li><a href="guide/sikgwon-jeongsan.html">결혼식 식권 정산하는 법</a></li>
-      <li><a href="guide/honju-jeongsanseo.html">혼주에게 넘기는 축의금 정산서 만들기</a></li>
-    </ul>
+  <!-- 가이드: 축의대에 앉기 전에 읽어두면 좋은 글 -->
+  <section class="guides">
+    <span class="guides-eyebrow">축의대 안내</span>
+    <h2 class="guides-title">처음이라도 괜찮습니다</h2>
+    <p class="guides-lead">축의대에 앉기 전에 한 번 읽어두면<br>마음이 한결 놓이는 이야기들입니다.</p>
+    <div class="orn-divider">
+      <svg class="orn" viewBox="0 0 34 12" aria-hidden="true"><path d="M17 1 L23 6 L17 11 L11 6 Z"/><circle cx="17" cy="6" r="1.1"/><circle cx="4" cy="6" r="1"/><circle cx="30" cy="6" r="1"/></svg>
+    </div>
+    <div class="guide-grid">
+      <a class="guide-card" href="guide/chukui-desk-checklist.html">
+        <span class="gc-num">一</span>
+        <strong>축의대 담당자 당일 체크리스트</strong>
+        <span class="gc-desc">언제 도착해서, 무엇을 챙기고, 어디에 앉을지</span>
+      </a>
+      <a class="guide-card" href="guide/chukui-jeopsu-order.html">
+        <span class="gc-num">二</span>
+        <strong>축의금 접수 순서 A to Z</strong>
+        <span class="gc-desc">봉투를 받는 순간부터 정산까지의 흐름</span>
+      </a>
+      <a class="guide-card" href="guide/chukui-jeongri-methods.html">
+        <span class="gc-num">三</span>
+        <strong>축의금 정리 방법 비교</strong>
+        <span class="gc-desc">수기 장부, 엑셀, 앱 — 무엇이 우리에게 맞을까</span>
+      </a>
+      <a class="guide-card" href="guide/sinrang-sinbu-hapchigi.html">
+        <span class="gc-num">四</span>
+        <strong>신랑측·신부측 따로 받고 합치기</strong>
+        <span class="gc-desc">두 접수대의 명단을 하나로 모으는 법</span>
+      </a>
+      <a class="guide-card" href="guide/sikgwon-jeongsan.html">
+        <span class="gc-num">五</span>
+        <strong>결혼식 식권 정산하는 법</strong>
+        <span class="gc-desc">몇 장이 나갔는지 헷갈리지 않으려면</span>
+      </a>
+      <a class="guide-card" href="guide/honju-jeongsanseo.html">
+        <span class="gc-num">六</span>
+        <strong>혼주에게 넘기는 정산서 만들기</strong>
+        <span class="gc-desc">부모님께 드릴 마지막 한 장을 정리합니다</span>
+      </a>
+    </div>
     <p class="site-foot"><a href="about.html">만든 사람</a> · <a href="privacy.html">개인정보 처리방침</a></p>
   </section>
   </div><!-- /col-left -->
