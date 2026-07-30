@@ -396,6 +396,9 @@
   .gc-desc{ display:block; margin-top:4px; font-size:.79rem; line-height:1.7; color:var(--muted); }
   .guides .site-foot{ margin-top:22px; padding-top:15px; border-top:1px solid var(--line);
     text-align:center; font-size:.82rem; color:var(--muted); }
+  .guides .site-foot a{ color:var(--muted); font-weight:600; text-decoration:none;
+    border-bottom:1px solid var(--line); }
+  .guides .site-foot a:hover{ color:var(--brand-strong); border-bottom-color:var(--brand); }
   .site-foot{ margin-top:22px!important; padding-top:14px; border-top:1px solid var(--line);
     text-align:center; font-size:.84rem!important; color:var(--muted)!important; }
 
@@ -418,6 +421,10 @@
     body[data-tab="entry"] .col-right{ display:none; }
     body[data-tab="list"] .summary,
     body[data-tab="list"] .card{ display:none; }
+
+    /* 안내 본문과 가이드는 '축의 현황' 탭에서만 보이게 (입력·방명록 화면은 도구에 집중) */
+    body[data-tab="entry"] .site-content, body[data-tab="entry"] .guides,
+    body[data-tab="list"] .site-content,  body[data-tab="list"] .guides{ display:none; }
 
     /* 히어로는 현황 탭에서만. 저장 상태 칩은 JS가 각 탭의 슬롯으로 옮겨
        (새 기록=제목 옆, 방명록=목록 헤더) 한 줄을 차지하지 않으면서 항상 보이게 한다. */
