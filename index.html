@@ -360,18 +360,41 @@
   .site-content strong{ font-weight:700; }
   .site-content em{ font-style:normal; color:var(--brand-strong); font-weight:600; }
   .site-content a{ color:var(--brand-strong); font-weight:600; }
-  .site-content .lead{ text-align:center; font-family:var(--display); font-size:1.02rem;
-    line-height:2.1; color:var(--ink); margin:14px 0 4px; letter-spacing:.01em; }
-  .site-content .orn-divider{ margin:20px 0 6px; }
-  .site-content .steps{ counter-reset:st; list-style:none; padding-left:0; }
-  .site-content .steps li{ position:relative; padding-left:30px; margin-bottom:11px; }
-  .site-content .steps li::before{ counter-increment:st; content:counter(st);
-    position:absolute; left:0; top:2px; width:20px; height:20px; border-radius:50%;
-    border:1px solid var(--gold); color:var(--gold); font-family:var(--display); font-size:11px;
-    display:flex; align-items:center; justify-content:center; }
-  .site-content .feats{ list-style:none; padding-left:0; }
-  .site-content .feats li{ padding-left:16px; position:relative; margin-bottom:9px; }
-  .site-content .feats li::before{ content:"·"; position:absolute; left:2px; color:var(--gold); font-weight:700; }
+  .site-content{ text-align:center; }
+  .site-content h1{ font-size:1.18rem; line-height:1.55; margin:0 0 10px; }
+  .site-content .lead{ font-family:var(--display); font-size:.94rem; line-height:1.95;
+    color:var(--muted); margin:0; letter-spacing:.01em; }
+  .site-content .orn-divider{ margin:18px 0 18px; }
+
+  /* 3단계 흐름 — 가로 3칸, 한눈에 */
+  .flow{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; list-style:none; padding:0; margin:0 0 12px; }
+  .flow li{ display:flex; flex-direction:column; align-items:center; gap:3px;
+    padding:13px 6px; background:var(--bg); border:1px solid var(--line); border-radius:12px; }
+  .flow .fn{ width:22px; height:22px; border-radius:50%; border:1px solid var(--gold); color:var(--gold);
+    font-family:var(--display); font-size:11px; display:flex; align-items:center; justify-content:center; margin-bottom:2px; }
+  .flow b{ font-size:.86rem; font-weight:700; color:var(--ink); }
+  .flow span:not(.fn){ font-size:.72rem; color:var(--muted); line-height:1.4; }
+
+  /* 특징 — 2열 팩트 그리드 */
+  .facts{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:0 0 18px; }
+  .facts div{ padding:11px 12px; background:var(--bg); border:1px solid var(--line);
+    border-radius:10px; text-align:left; }
+  .facts b{ display:block; font-size:.85rem; font-weight:700; color:var(--brand-strong); }
+  .facts span{ display:block; font-size:.72rem; color:var(--muted); margin-top:2px; }
+
+  /* FAQ — 아코디언으로 접어 세로 길이를 줄임 */
+  .qa{ text-align:left; border-top:1px solid var(--line); }
+  .qa:last-of-type{ border-bottom:1px solid var(--line); }
+  .qa summary{ list-style:none; cursor:pointer; padding:13px 26px 13px 2px; position:relative;
+    font-size:.88rem; font-weight:600; color:var(--ink); }
+  .qa summary::-webkit-details-marker{ display:none; }
+  .qa summary::after{ content:"+"; position:absolute; right:6px; top:50%; transform:translateY(-50%);
+    color:var(--gold); font-size:1rem; line-height:1; }
+  .qa[open] summary::after{ content:"−"; }
+  .qa p{ margin:0 0 13px; padding-right:6px; font-size:.85rem; line-height:1.85; color:var(--muted); }
+  .qa p a{ color:var(--brand-strong); font-weight:600; }
+  .privacy-line{ font-size:.76rem!important; line-height:1.8; color:var(--muted)!important; margin:0 0 14px!important; }
+  .privacy-line a{ color:var(--brand-strong); font-weight:600; }
 
   /* 가이드 카드 — 청첩장 결 */
   .guides{ margin:22px 0 8px; padding:26px 18px 24px; text-align:center;
@@ -639,61 +662,58 @@
 
   <!-- 사이트 본문: 축의대를 처음 맡은 분을 위한 안내 -->
   <section class="site-content">
-    <h1>결혼식 축의금 접수, 축의대에서 마음까지 기록합니다</h1>
-
-    <p class="lead">
-      봉투에 담겨 오는 것은 숫자가 아니라 마음입니다.<br>
-      먼 길을 달려온 사람, 오랜만에 얼굴을 보여 준 사람.<br>
-      그 이름들이 잊히지 않도록, 받는 그 자리에서 적어 둡니다.
-    </p>
+    <h1>결혼식 축의금, 접수대에서 바로 정리</h1>
+    <p class="lead">봉투에 담겨 오는 건 숫자가 아니라 마음입니다.<br>그 이름들이 잊히지 않도록.</p>
 
     <div class="orn-divider">
       <svg class="orn" viewBox="0 0 34 12" aria-hidden="true"><path d="M17 1 L23 6 L17 11 L11 6 Z"/><circle cx="17" cy="6" r="1.1"/><circle cx="4" cy="6" r="1"/><circle cx="30" cy="6" r="1"/></svg>
     </div>
 
-    <h2>세 번의 손짓이면 됩니다</h2>
-    <ol class="steps">
-      <li><strong>신랑측인지 신부측인지 고릅니다.</strong> 한 번 고르면 그대로 유지되어, 한쪽 접수만 계속 받을 때 편합니다.</li>
-      <li><strong>이름과 금액을 넣습니다.</strong> 10만원이 미리 적혀 있고, 버튼으로 더하거나 직접 고쳐도 됩니다.</li>
-      <li><strong>기록하기를 누릅니다.</strong> 손님마다 번호가 차례로 붙고, 내용을 고쳐도 그 번호는 그대로 남습니다.</li>
+    <ol class="flow">
+      <li><span class="fn">1</span><b>측 선택</b><span>신랑측·신부측</span></li>
+      <li><span class="fn">2</span><b>이름 · 금액</b><span>10만원 기본</span></li>
+      <li><span class="fn">3</span><b>기록하기</b><span>번호 자동</span></li>
     </ol>
-    <p>
-      식권은 0개부터 5개까지 버튼으로 고르고, 그 밖의 숫자는 직접 적으면 됩니다.
-      예식이 끝나면 총액과 인원, 신랑측·신부측 합계, 식권 수가 한 화면에 모입니다.
-    </p>
 
-    <h2>바쁜 손을 위해 만들었습니다</h2>
-    <ul class="feats">
-      <li><strong>하객 수에 제한이 없습니다</strong> — 몇 분이 오시든 끝까지 적을 수 있습니다.</li>
-      <li><strong>가입도 로그인도 없습니다</strong> — 링크를 열면 그것으로 준비가 끝납니다.</li>
-      <li><strong>인터넷이 끊겨도 괜찮습니다</strong> — 예식장 지하에서도 기록은 이어집니다.</li>
-      <li><strong>두 접수대를 하나로 모읍니다</strong> — 신랑측과 신부측이 따로 적어도 나중에 합쳐집니다.</li>
-      <li><strong>엑셀과 인쇄로 남습니다</strong> — 명단과 합계를 그대로 혼주께 전해 드릴 수 있습니다.</li>
-    </ul>
+    <div class="facts">
+      <div><b>제한 없음</b><span>하객 수</span></div>
+      <div><b>가입 없음</b><span>링크만 열면 끝</span></div>
+      <div><b>기기에만 저장</b><span>서버 전송 안 함</span></div>
+      <div><b>두 대 합치기</b><span>신랑측 + 신부측</span></div>
+      <div><b>식권까지</b><span>장수 함께 기록</span></div>
+      <div><b>엑셀 · 인쇄</b><span>정산서로 전달</span></div>
+    </div>
 
-    <h2>기록은 이 기기에만 남습니다</h2>
-    <p>
-      입력한 명단은 서버로 전송되지 않습니다. 쓰고 계신 기기 안에만 저장되고,
-      만든 사람도 하객의 이름이나 금액을 볼 수 없습니다.
-    </p>
-    <p>
-      대신 사라지지 않는 것을 가장 중요하게 여겼습니다. 기기 안 두 곳에 동시에 저장하고,
-      입력할 때마다 자동 백업을 서른 개까지 따로 남깁니다. 실수로 지웠다면
-      <em>공유·더보기 → 자동 백업에서 복구</em>로 되돌릴 수 있습니다.
-      다만 브라우저 기록을 지우면 함께 사라지니, 예식이 끝나면 엑셀이나 백업 파일로 한 번 더 남겨 두세요.
-    </p>
+    <p class="privacy-line">입력한 명단은 서버로 전송되지 않고 이 기기에만 저장됩니다. · <a href="privacy.html">개인정보 처리방침</a></p>
 
-    <h2>자주 묻는 질문</h2>
-    <h3>앱을 설치해야 하나요?</h3>
-    <p>아니요. 주소만 열면 바로 쓸 수 있습니다. 홈 화면에 추가해 두면 앱처럼 열리고 오프라인에서도 실행됩니다.</p>
-    <h3>인터넷이 안 되는 예식장에서도 되나요?</h3>
-    <p>됩니다. 한 번 열어두면 이후에는 신호가 없어도 기록됩니다. 입력 자체가 인터넷을 쓰지 않습니다.</p>
-    <h3>두 사람이 따로 받았는데 합칠 수 있나요?</h3>
-    <p>각자 <em>엑셀 저장</em>으로 파일을 만든 뒤, 한쪽에서 <em>다른 기기 데이터 합치기</em>로 상대 파일을 불러오면 하나가 됩니다. 번호는 겹치지 않게 다시 매겨집니다.</p>
-    <h3>손님 번호를 바꿀 수 있나요?</h3>
-    <p>목록에서 항목을 눌러 번호를 고칠 수 있습니다. 이미 쓰는 번호와 겹치면 저장되지 않고, 이름이나 금액만 고칠 때는 번호가 그대로 유지됩니다.</p>
-    <h3>정말 무료인가요?</h3>
-    <p>네. 기능이나 기간 제한 없이 무료입니다. 운영은 광고로 유지합니다.</p>
+    <details class="qa">
+      <summary>설치하거나 가입해야 하나요?</summary>
+      <p>아니요. 브라우저에서 주소만 열면 바로 쓸 수 있습니다. 홈 화면에 추가해 두면 앱처럼 열리고, 접수대에서 다시 찾아 들어갈 필요가 없습니다.</p>
+    </details>
+    <details class="qa">
+      <summary>축의대는 누가 만들었나요?</summary>
+      <p>최주헌이 혼자 만들고 운영하는 서비스입니다. 예식 업체와 제휴 관계가 없어 특정 예식장이나 상품을 권하지 않습니다. 자세한 내용은 <a href="about.html">만든 사람</a>에 적어 두었습니다.</p>
+    </details>
+    <details class="qa">
+      <summary>인터넷이 약한 예식장에서도 되나요?</summary>
+      <p>한 번 열어두면 이후에는 신호가 없어도 기록됩니다. 입력 자체가 인터넷을 쓰지 않습니다.</p>
+    </details>
+    <details class="qa">
+      <summary>기록이 사라지지는 않나요?</summary>
+      <p>기기 안 두 곳에 동시에 저장하고, 입력할 때마다 자동 백업을 서른 개까지 남깁니다. 실수로 지웠다면 <em>공유·더보기 → 자동 백업에서 복구</em>로 되돌립니다. 다만 브라우저 기록을 지우면 함께 사라지니, 예식 후 엑셀로 한 번 더 저장해 두세요.</p>
+    </details>
+    <details class="qa">
+      <summary>두 사람이 따로 받았는데 합칠 수 있나요?</summary>
+      <p>각자 <em>엑셀 저장</em>으로 파일을 만든 뒤, 한쪽에서 <em>다른 기기 데이터 합치기</em>로 불러오면 하나가 됩니다. 번호는 겹치지 않게 다시 매겨집니다.</p>
+    </details>
+    <details class="qa">
+      <summary>손님 번호를 바꿀 수 있나요?</summary>
+      <p>목록에서 항목을 눌러 고칠 수 있습니다. 이미 쓰는 번호와는 겹칠 수 없고, 이름이나 금액만 고칠 때는 번호가 그대로 유지됩니다.</p>
+    </details>
+    <details class="qa">
+      <summary>정말 무료인가요?</summary>
+      <p>네. 기능이나 기간 제한 없이 무료입니다. 운영은 광고로 유지합니다.</p>
+    </details>
   </section>
 
   <!-- 가이드: 축의대에 앉기 전에 읽어두면 좋은 글 -->
