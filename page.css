@@ -1,0 +1,55 @@
+/* 축의대 — 안내/가이드 페이지 공통 스타일 (앱과 같은 '축의 청첩' 톤) */
+:root{
+  --bg:#F5F0E8; --panel:#FCF8F1; --ink:#2E2A22; --muted:#857B69; --line:#E1D8C7;
+  --brand:#8A9E88; --brand-strong:#47593F; --brand-soft:#E8EEE2; --gold:#BE9A44;
+  --display:"Didot","Bodoni MT","Hoefler Text",Palatino,"Palatino Linotype",Georgia,"AppleMyungjo","Nanum Myeongjo","Batang",serif;
+  --body:"Helvetica Neue","Avenir Next",Avenir,"Segoe UI",Roboto,Arial,"Apple SD Gothic Neo","Malgun Gothic","Nanum Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#1A1712; --panel:#24211A; --ink:#EFE8DA; --muted:#A99D87; --line:#3A3529;
+    --brand:#9DB199; --brand-strong:#BBCDB4; --brand-soft:#262C20; --gold:#D8B667; }
+}
+*{ box-sizing:border-box; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--body);
+  line-height:1.5; -webkit-text-size-adjust:100%; }
+.page{ max-width:720px; margin:0 auto; padding:14px 20px 72px; }
+
+.topbar{ padding:6px 0 2px; }
+.topbar .home{ font-size:.86rem; color:var(--muted); text-decoration:none; font-weight:600; }
+.topbar .home:hover{ color:var(--brand-strong); }
+
+.crest{ text-align:center; color:var(--gold); font-family:var(--display); font-size:26px; margin-top:10px; }
+h1{ font-family:var(--display); font-weight:400; font-size:1.62rem; line-height:1.45;
+  text-align:center; letter-spacing:.02em; margin:8px 0 0; }
+.rule{ width:44px; height:1px; background:var(--gold); margin:16px auto 26px; opacity:.7; }
+
+h2{ font-family:var(--display); font-weight:400; font-size:1.14rem; letter-spacing:.02em;
+  margin:30px 0 10px; padding-top:18px; border-top:1px solid var(--line); }
+h3{ font-size:.98rem; font-weight:700; margin:20px 0 6px; }
+p{ font-size:.94rem; line-height:1.9; margin:0 0 12px; }
+ul,ol{ padding-left:22px; margin:0 0 12px; }
+li{ font-size:.94rem; line-height:1.85; margin-bottom:7px; }
+strong{ font-weight:700; }
+em{ font-style:normal; color:var(--brand-strong); font-weight:600; }
+a{ color:var(--brand-strong); font-weight:600; }
+
+table{ width:100%; border-collapse:collapse; margin:0 0 14px; font-size:.9rem; display:block; overflow-x:auto; }
+th,td{ border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top; }
+th{ background:var(--brand-soft); font-weight:700; white-space:nowrap; }
+
+blockquote{ margin:0 0 12px; padding:12px 14px; background:var(--panel);
+  border-left:3px solid var(--gold); border-radius:0 8px 8px 0; }
+blockquote p:last-child{ margin-bottom:0; }
+
+.cta{ display:block; margin:26px 0; padding:16px 18px; background:var(--panel);
+  border:1px solid var(--line); border-radius:14px; text-decoration:none; color:var(--ink); }
+.cta strong{ display:block; font-family:var(--display); font-weight:400; font-size:1.06rem; margin-bottom:4px; color:var(--brand-strong); }
+.cta span{ font-size:.86rem; color:var(--muted); font-weight:400; }
+
+.faq h3{ margin-top:16px; }
+.back{ margin-top:34px; padding-top:16px; border-top:1px solid var(--line); text-align:center; font-size:.88rem; }
+.ad-wrap{ margin:26px 0 6px; padding-top:14px; border-top:1px solid var(--line); text-align:center; }
+.ad-label{ font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); opacity:.7; display:block; margin-bottom:6px; }
+footer.site{ margin-top:30px; padding-top:16px; border-top:1px solid var(--line);
+  text-align:center; font-size:.82rem; color:var(--muted); }
+footer.site a{ color:var(--muted); font-weight:600; }
