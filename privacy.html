@@ -6,38 +6,11 @@
 <meta name="theme-color" content="#F5F0E8">
 <meta name="robots" content="index,follow">
 <title>개인정보 처리방침 · 축의대</title>
-<style>
-  :root{
-    --bg:#F5F0E8; --panel:#FCF8F1; --ink:#2E2A22; --muted:#857B69; --line:#E1D8C7;
-    --brand:#8A9E88; --brand-strong:#47593F; --gold:#BE9A44;
-    --display:"Didot","Bodoni MT","Hoefler Text",Palatino,"Palatino Linotype",Georgia,"AppleMyungjo","Nanum Myeongjo","Batang",serif;
-    --body:"Helvetica Neue","Avenir Next",Avenir,"Segoe UI",Roboto,Arial,"Apple SD Gothic Neo","Malgun Gothic","Nanum Gothic",sans-serif;
-  }
-  @media (prefers-color-scheme: dark){
-    :root{ --bg:#1A1712; --panel:#24211A; --ink:#EFE8DA; --muted:#A99D87; --line:#3A3529;
-      --brand:#9DB199; --brand-strong:#BBCDB4; --gold:#D8B667; }
-  }
-  *{box-sizing:border-box}
-  body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); line-height:1.7; -webkit-text-size-adjust:100%; }
-  .wrap{ max-width:760px; margin:0 auto; padding:28px 20px 80px; }
-  .crest{ text-align:center; color:var(--gold); font-family:var(--display); font-size:30px; }
-  h1{ font-family:var(--display); font-weight:400; font-size:1.7rem; text-align:center; letter-spacing:.04em; margin:6px 0 4px; }
-  .eff{ text-align:center; color:var(--muted); font-size:13px; margin-bottom:8px; }
-  .rule{ width:44px; height:1px; background:var(--gold); margin:14px auto 26px; opacity:.7; }
-  .note{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; font-size:14px; color:var(--ink); margin-bottom:26px; }
-  .note b{ color:var(--brand-strong); }
-  h2{ font-family:var(--display); font-weight:400; font-size:1.2rem; letter-spacing:.03em; margin:28px 0 8px; padding-top:8px; border-top:1px solid var(--line); }
-  h2:first-of-type{ border-top:none; }
-  p, li{ font-size:14.5px; color:var(--ink); }
-  ul{ padding-left:20px; }
-  a{ color:var(--brand-strong); font-weight:600; }
-  .ph{ background:rgba(190,154,68,.16); border-bottom:1px dashed var(--gold); padding:0 3px; border-radius:3px; }
-  .back{ display:inline-block; margin-top:30px; color:var(--brand-strong); font-weight:600; text-decoration:none; }
-  footer{ margin-top:34px; color:var(--muted); font-size:12.5px; text-align:center; }
-</style>
+<link rel="stylesheet" href="page.css">
 </head>
 <body>
-<div class="wrap">
+<div class="page">
+  <nav class="topbar"><a class="home" href="./">← 축의대</a></nav>
   <div class="crest">囍</div>
   <h1>개인정보 처리방침</h1>
   <div class="eff">시행일: 2026. 07. 23</div>
@@ -86,10 +59,9 @@
 
   <h2>8. 문의</h2>
   <p>개인정보 관련 문의: <a href="mailto:joohun484@gmail.com">joohun484@gmail.com</a></p>
-
-  <a class="back" href="index.html">← 축의대로 돌아가기</a>
-  <footer>
-    <span class="ph">[대괄호 표시]</span> 부분은 실제 정보로 바꿔 주세요. 본 문서는 법률 자문이 아니며, 최종 문구는 관할 지역 법령에 맞게 검토하시기를 권장합니다.
+  <footer class="site">
+    <a href="./">축의대</a> · <a href="about.html">만든 사람</a> · <a href="guide/chukui-desk-checklist.html">축의대 안내</a>
+    <p class="fine">대괄호로 표시된 항목은 실제 정보로 교체해 주세요. 본 문서는 법률 자문이 아닙니다.</p>
   </footer>
 </div>
 </body>

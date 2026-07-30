@@ -707,13 +707,13 @@
     <div class="guide-grid">
       <a class="guide-card" href="guide/chukui-desk-checklist.html">
         <span class="gc-num">一</span>
-        <strong>축의대 담당자 당일 체크리스트</strong>
+        <strong>접수대 담당자 당일 체크리스트</strong>
         <span class="gc-desc">언제 도착해서, 무엇을 챙기고, 어디에 앉을지</span>
       </a>
       <a class="guide-card" href="guide/chukui-jeopsu-order.html">
         <span class="gc-num">二</span>
-        <strong>축의금 접수 순서 A to Z</strong>
-        <span class="gc-desc">봉투를 받는 순간부터 정산까지의 흐름</span>
+        <strong>축의금 접수 순서</strong>
+        <span class="gc-desc">봉투 한 장이 처리되는 흐름과 예외 상황</span>
       </a>
       <a class="guide-card" href="guide/chukui-jeongri-methods.html">
         <span class="gc-num">三</span>
@@ -722,17 +722,17 @@
       </a>
       <a class="guide-card" href="guide/sinrang-sinbu-hapchigi.html">
         <span class="gc-num">四</span>
-        <strong>신랑측·신부측 따로 받고 합치기</strong>
+        <strong>신랑측·신부측 기록 합치기</strong>
         <span class="gc-desc">두 접수대의 명단을 하나로 모으는 법</span>
       </a>
       <a class="guide-card" href="guide/sikgwon-jeongsan.html">
         <span class="gc-num">五</span>
-        <strong>결혼식 식권 정산하는 법</strong>
+        <strong>식권 정산</strong>
         <span class="gc-desc">몇 장이 나갔는지 헷갈리지 않으려면</span>
       </a>
       <a class="guide-card" href="guide/honju-jeongsanseo.html">
         <span class="gc-num">六</span>
-        <strong>혼주에게 넘기는 정산서 만들기</strong>
+        <strong>혼주에게 넘기는 정산서</strong>
         <span class="gc-desc">부모님께 드릴 마지막 한 장을 정리합니다</span>
       </a>
     </div>
@@ -2173,10 +2173,13 @@
   // ============================================================
   async function init(){
     bind();
-    setTab('entry');                           // 시작 탭: 새 기록(가장 자주 쓰는 화면)
+    setTab('entry');                           // 임시: 로드 후 기록 유무에 따라 다시 정합니다
     setInputSide('groom');
     setSaveState('ok'); $('saveText').textContent = '준비됨';
     await loadAll();
+    // 기록이 없으면(첫 방문·검색엔진) 안내가 있는 '축의 현황'으로, 기록이 있으면 바로 '새 기록'으로.
+    // 안내 본문이 현황 탭에만 있으므로, 이래야 처음 온 사람과 크롤러가 설명을 볼 수 있습니다.
+    setTab(entries.length ? 'entry' : 'summary');
     renderAll();
     resetInputDefaults();                      // 금액 10만원 · 식권 1개 기본 선택
   }

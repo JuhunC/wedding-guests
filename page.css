@@ -47,9 +47,26 @@ blockquote p:last-child{ margin-bottom:0; }
 .cta span{ font-size:.86rem; color:var(--muted); font-weight:400; }
 
 .faq h3{ margin-top:16px; }
+/* 시리즈 목차 — 여섯 편 고정, 현재 글은 링크 없이 표시 */
+.series{ counter-reset:sr; list-style:none; padding-left:0; }
+.series li{ position:relative; padding-left:28px; margin-bottom:9px; }
+.series li::before{ counter-increment:sr; content:counter(sr);
+  position:absolute; left:0; top:2px; width:19px; height:19px; border-radius:50%;
+  border:1px solid var(--gold); color:var(--gold); font-family:var(--display); font-size:10.5px;
+  display:flex; align-items:center; justify-content:center; }
+.series li strong{ color:var(--muted); font-weight:600; }
 .back{ margin-top:34px; padding-top:16px; border-top:1px solid var(--line); text-align:center; font-size:.88rem; }
 .ad-wrap{ margin:26px 0 6px; padding-top:14px; border-top:1px solid var(--line); text-align:center; }
 .ad-label{ font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); opacity:.7; display:block; margin-bottom:6px; }
 footer.site{ margin-top:30px; padding-top:16px; border-top:1px solid var(--line);
   text-align:center; font-size:.82rem; color:var(--muted); }
 footer.site a{ color:var(--muted); font-weight:600; }
+footer.site .fine{ margin:10px 0 0; font-size:.76rem; line-height:1.7; color:var(--muted); opacity:.85; }
+
+/* 개인정보 처리방침 전용 */
+.eff{ text-align:center; color:var(--muted); font-size:.82rem; margin-top:8px; }
+.note{ background:var(--panel); border:1px solid var(--line); border-radius:12px;
+  padding:14px 16px; font-size:.9rem; line-height:1.8; margin-bottom:26px; }
+.note b{ color:var(--brand-strong); }
+.ph{ background:rgba(190,154,68,.16); border-bottom:1px dashed var(--gold);
+  padding:0 3px; border-radius:3px; }
